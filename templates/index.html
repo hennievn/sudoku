@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+    <div id="theme-toggle" class="material-symbols-outlined">light_mode</div>
+    <div id="main-content">
+        <h1>Sudoku</h1>
+        <div id="game-controls">
+            <button id="new-game">New Game</button>
+        </div>
+        <div id="timer">00:00</div>
+        <div id="sudoku-board"></div>
+        <div id="controls-sidebar">
+            <div id="number-palette">
+                <button class="palette-icon material-symbols-outlined palette-button" id="undo-button" style="grid-area: undo;">undo</button>
+                <button class="palette-icon material-symbols-outlined palette-button" id="hint-button" onclick="getHints()" style="grid-area: hint;">transition_dissolve</button>
+                <div class="palette-number" style="grid-area: num1;">1</div>
+                <div class="palette-number" style="grid-area: num2;">2</div>
+                <div class="palette-number" style="grid-area: num3;">3</div>
+                <button class="palette-icon material-symbols-outlined palette-button" id="pencil-icon" style="grid-area: pencil;">draw</button>
+
+                <button class="palette-icon material-symbols-outlined palette-button" id="redo-button" style="grid-area: redo;">redo</button>
+                <button class="palette-icon material-symbols-outlined palette-button" id="check-button" onclick="checkSolution()" style="grid-area: check;">check_circle</button>
+                <div class="palette-number" style="grid-area: num4;">4</div>
+                <div class="palette-number" style="grid-area: num5;">5</div>
+                <div class="palette-number" style="grid-area: num6;">6</div>
+                <button class="palette-icon material-symbols-outlined palette-button" id="pen-icon" style="grid-area: pen;">ink_pen</button>
+
+                <button class="palette-icon material-symbols-outlined palette-button" id="help" onclick="showHelp()" style="grid-area: help;">help</button>
+                <button class="palette-icon material-symbols-outlined palette-button" id="restart-button" onclick="restartGame()" style="grid-area: restart;">restart_alt</button>
+                <div class="palette-number" style="grid-area: num7;">7</div>
+                <div class="palette-number" style="grid-area: num8;">8</div>
+                <div class="palette-number" style="grid-area: num9;">9</div>
+                <button class="palette-icon material-symbols-outlined palette-button" id="backspace-icon" style="grid-area: backspace;">backspace</button>
+            </div>
+            <p id="status"></p>
+        </div>
+    </div>
+
+    <div id="help-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Help & Strategy</h2>
+            <h3>Keyboard Shortcuts:</h3>
+            <div class="keyboard-shortcuts-grid">
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">N</span> <span class="material-symbols-outlined">add_box</span></span> <span class="shortcut-desc">New Game</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">R</span> <span class="material-symbols-outlined">restart_alt</span></span> <span class="shortcut-desc">Restart Game</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">P</span> <span class="material-symbols-outlined">draw</span></span> <span class="shortcut-desc">Toggle Pencil Mode</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">H</span> <span class="material-symbols-outlined">transition_dissolve</span></span> <span class="shortcut-desc">Get a Hint</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">C</span> <span class="material-symbols-outlined">check_circle</span></span> <span class="shortcut-desc">Check Solution</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">I</span> <span class="material-symbols-outlined">help</span></span> <span class="shortcut-desc">Show Help Screen</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">1-9</span> <span class="material-symbols-outlined">pin</span></span> <span class="shortcut-desc">Enter Number</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">Backspace</span> <span class="material-symbols-outlined">backspace</span></span> <span class="shortcut-desc">Delete Number</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">Z</span> <span class="material-symbols-outlined">undo</span></span> <span class="shortcut-desc">Undo</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">Y</span> <span class="material-symbols-outlined">redo</span></span> <span class="shortcut-desc">Redo</span></div>
+                <div class="shortcut-item"><span class="shortcut-key-icon"><span class="material-symbols-outlined">ink_pen</span></span> <span class="shortcut-desc">Enter numbers</span></div>
+            </div>
+
+            <h3>Sudoku Strategy:</h3>
+            <div class="sudoku-strategy">
+                <p>Sudoku is a logic-based, combinatorial number-placement puzzle. The objective is to fill a 9×9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids that compose the grid (also called "boxes", "blocks", or "regions") contains all of the digits from 1 to 9.</p>
+                <h4>Basic Techniques:</h4>
+                <ul>
+                    <li><b>Scanning:</b> Look for numbers that are already present in a row, column, or 3x3 block. This helps eliminate possibilities for other cells.</li>
+                    <li><b>Cross-hatching:</b> Use scanning across multiple rows/columns to find the only possible position for a number in a block.</li>
+                    <li><b>Counting:</b> Count which numbers are missing from a row, column, or block.</li>
+                </ul>
+                <h4>Intermediate Techniques:</h4>
+                <ul>
+                    <li><b>Hidden Singles:</b> A number is a hidden single in a row, column, or block if it can only go in one cell within that row, column, or block, even if that cell has other candidates.</li>
+                    <li><b>Naked Pairs/Triples:</b> If two (or three) cells in a row, column, or block contain the same two (or three) candidates, then those candidates can be eliminated from other cells in that row, column, or block.</li>
+                </ul>
+                <p>Practice is key! The more you play, the better you'll become at spotting patterns and applying strategies.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="solved-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Congratulations!</h2>
+            <p>You solved the puzzle!</p>
+            <button id="new-game-solved">New Game</button>
+        </div>
+    </div>
+
+    <div id="difficulty-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Select Difficulty</h2>
+            <button id="easy-difficulty-btn">Easy</button>
+            <button id="medium-difficulty-btn">Medium</button>
+            <button id="hard-difficulty-btn">Hard</button>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=1755453915"></script>
+</body>
+</html>
