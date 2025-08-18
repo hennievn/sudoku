@@ -66,49 +66,56 @@
     color: var(--text-color);
 }
 
+.dark-mode .cell.selected .pencil-mark {
+    color: rgb(50, 50, 50); /* Darker color for selected pencil marks in dark mode */
+}
+
+/* Base styles (Portrait Mode Default) */
 body {
     font-family: sans-serif;
     display: flex;
-    flex-direction: column; /* Default to column for portrait */
+    flex-direction: column;
     align-items: center;
     background-color: var(--bg-color);
     color: var(--text-color);
-    position: relative; /* Added for positioning context */
+    position: relative;
+    padding: 10px; /* Add some padding for portrait */
 }
 
 #theme-toggle {
     position: absolute;
     top: 10px;
     right: 10px;
-    z-index: 1000; /* Ensure it's on top */
+    z-index: 1000;
     cursor: pointer;
-    font-size: 2em; /* Adjust size as needed */
+    font-size: 2em;
     color: var(--text-color);
 }
 
 h1 {
-    margin-bottom: 2px; /* Further reduce space below title */
+    margin-bottom: 2px;
     margin-top: 5px;
 }
 
 #game-controls {
-    margin-top: 2px; /* Further reduce space above game controls */
+    margin-top: 2px;
 }
 
 #timer {
     font-size: 1.8em;
     font-weight: bold;
-    margin-top: 2px; /* Further reduce space above timer */
+    margin-top: 2px;
     color: var(--text-color);
 }
 
 #status {
     margin-top: 2px !important;
     font-weight: bold;
-    padding: 2px 15px; /* Reduce top padding */
+    padding: 2px 15px;
     border-radius: 5px;
-    line-height: 1; /* Minimize vertical space */
-    display: block; /* Ensure block-level behavior */
+    line-height: 1;
+    display: block;
+    text-align: center;
 }
 
 #sudoku-board {
@@ -116,7 +123,7 @@ h1 {
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(9, 1fr);
     border: 3px solid var(--board-border-color);
-    margin-top: 4px; /* Further reduce space above sudoku board */
+    margin-top: 4px;
     width: 90vw;
     max-width: 500px;
     aspect-ratio: 1 / 1;
@@ -124,12 +131,12 @@ h1 {
 
 #number-palette {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    grid-template-rows: auto auto auto auto auto auto; /* 6 rows */
-    row-gap: 10px; /* Vertical spacing */
-    column-gap: 15px; /* Horizontal spacing */
-    margin-top: 10px; /* Further reduce space above number palette */
-    max-width: 500px; /* Match Sudoku board max-width */
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto auto auto auto auto;
+    row-gap: 10px;
+    column-gap: 15px;
+    margin-top: 10px;
+    max-width: 500px;
     grid-template-areas:
         "undo redo pencil"
         "num1 num2 num3"
@@ -148,70 +155,9 @@ h1 {
     display: none; /* Hidden by default in portrait */
 }
 
-/* Landscape styles */
-@media (orientation: landscape) {
-    body {
-        flex-direction: row; /* Arrange board and controls side-by-side */
-        justify-content: center;
-        align-items: flex-start; /* Align items to the top */
-        padding: 20px; /* Add some padding */
-    }
 
-    #main-content {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 20px; /* Space between board and controls */
-    }
 
-    #sudoku-board {
-        width: auto;
-        max-width: 70vh; /* Adjust based on viewport height */
-        height: 70vh;
-        margin-top: 0; /* Remove top margin in landscape */
-    }
-
-    #controls-sidebar {
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center; /* Center items within sidebar */
-        margin-left: 20px;
-        width: auto;
-        max-width: none;
-        gap: 10px; /* Space between elements in sidebar */
-    }
-
-    #number-palette {
-        grid-template-columns: repeat(3, 1fr); /* 3 columns for numbers */
-        grid-template-areas:
-            "undo redo pencil"
-            "num1 num2 num3"
-            "num4 num5 num6"
-            "num7 num8 num9"
-            "hint check backspace"
-            "restart help pen";
-        max-width: none;
-        /* margin-top: 0; Removed, handled by controls-sidebar gap */
-    }
-
-    .palette-number, button.palette-icon {
-        min-width: 80px;
-        height: 50px;
-        font-size: 1.8em;
-    }
-
-    #action-controls {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-top: 10px; /* Add some space below palette */
-    }
-
-    h1, #game-controls, #timer, #status {
-        display: block; /* Show these elements in landscape */
-        margin-top: 0; /* Ensure no extra top margin */
-    }
-}
-
+/* Common styles for both orientations */
 .cell {
     border: 1px solid var(--cell-border-color);
     display: flex;
@@ -219,17 +165,17 @@ h1 {
     align-items: center;
     background-color: var(--cell-bg-color);
     position: relative;
-    box-sizing: border-box; /* Ensure consistent sizing */
+    box-sizing: border-box;
 }
 
 .cell.original {
     font-weight: bold;
     background-color: var(--original-cell-bg-color);
-    font-size: clamp(1.9em, 4vw, 2.4em); /* Specific font size for original numbers */
+    font-size: clamp(1.9em, 4vw, 2.4em);
 }
 
 .cell.user-entered {
-    font-size: clamp(2.0em, 4.5vw, 2.7em); /* Larger font for user-entered numbers, another 20% bigger */
+    font-size: clamp(2.0em, 4.5vw, 2.7em);
     background-color: var(--cell-bg-color);
 }
 
@@ -243,22 +189,22 @@ h1 {
 }
 
 .pencil-mark {
-    font-size: 0.85em; /* Reverted to previous state as per user instruction */
+    font-size: 0.85em;
     color: var(--pencil-mark-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center; /* Explicitly center text */
-    box-sizing: border-box; /* Ensure consistent sizing */
-    line-height: 1; /* Minimize vertical space */
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .pencil-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-    grid-template-rows: repeat(3, 1fr); /* 3 equal rows */
-    width: 100%; /* Take full width of parent cell */
-    height: 100%; /* Take full height of parent cell */
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100%;
 }
 
 .cell.selected {
@@ -287,13 +233,13 @@ h1 {
 }
 
 .palette-number, button.palette-icon {
-    min-width: 60px; /* Force wider cells */
-    height: 40px; /* Reduce height */
+    min-width: 60px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 1.5em; /* Adjust font size for numbers */
+    font-size: 1.5em;
     border: 1px solid var(--palette-btn-border-color);
     background-color: var(--palette-btn-bg-color);
 }
@@ -316,374 +262,44 @@ button.palette-icon.active-icon {
     font-size: 0.8em;
 }
 
-#timer {
-    font-size: 1.8em;
-    font-weight: bold;
-    margin-top: 2px; /* Further reduce space above timer */
-    color: var(--text-color);
-}
-
 #action-controls {
     margin-top: 13px;
-    margin-bottom: 2px !important; /* Explicitly remove bottom margin with !important */
-    display: block; /* Ensure block-level behavior */
-    overflow: hidden; /* Prevent margin collapsing */
-}
-
-#status {
-    margin-top: 2px !important;
-    font-weight: bold;
-    padding: 2px 15px; /* Reduce top padding */
-    border-radius: 5px;
-    line-height: 1; /* Minimize vertical space */
-    display: block; /* Ensure block-level behavior */
-}
-
-#game-controls {
-    margin-top: 2px; /* Further reduce space above game controls */
-}
-
-#new-game {
-    padding: 12px 25px; /* Increase button size */
-    font-size: 1.2em; /* Increase font size */
-    cursor: pointer;
-    background-color: var(--new-game-btn-bg);
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-#new-game:hover {
-    background-color: var(--new-game-btn-hover-bg);
-}
-
-.modal {
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: var(--modal-overlay-color);
-}
-
-.modal-content {
-    background-color: var(--modal-bg-color);
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid var(--modal-border-color);
-    width: 80%;
-    max-width: 500px;
-    text-align: center; /* Center content */
-    max-height: 80vh; /* Make it scrollable */
-    overflow-y: auto; /* Enable vertical scrolling */
-}
-
-#solved-modal .modal-content h2 {
-    color: var(--status-success-color);
-}
-
-#solved-modal .modal-content button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    background-color: var(--new-game-btn-bg);
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-#solved-modal .modal-content button:hover {
-    background-color: var(--new-game-btn-hover-bg);
-}
-
-#difficulty-modal .modal-content button {
+    margin-bottom: 2px !important;
     display: block;
-    width: 80%;
-    margin: 10px auto;
-    padding: 15px;
-    font-size: 1.5em;
-    cursor: pointer;
-    background-color: var(--difficulty-btn-bg);
-    color: white;
-    border: none;
-    border-radius: 8px;
+    overflow: hidden;
 }
 
-#difficulty-modal .modal-content button:hover {
-    background-color: var(--difficulty-btn-hover-bg);
-}
-
-#difficulty-modal .modal-content h2 {
-    margin-bottom: 20px;
-    color: var(--text-color);
-}
-
-.close-button {
-    color: var(--close-button-color);
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.keyboard-shortcuts-grid {
-    display: grid;
-    grid-template-columns: auto 1fr; /* Key and Icon on left, Description on right */
-    gap: 5px 15px; /* Row and column gap */
-    text-align: left; /* Align text to left */
-    margin-top: 15px;
-    margin-bottom: 20px;
-}
-
-.shortcut-key-icon {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* Space between key and icon */
-}
-
-.shortcut-item .material-symbols-outlined {
-    font-size: 1.2em; /* Adjust icon size */
-    vertical-align: middle; /* Align icon with text */
-    /* margin-right: 5px; Removed as gap handles spacing */
-    color: var(--text-color); /* Use text color for icons */
-}
-
-.shortcut-key {
-    font-weight: bold;
-    color: var(--user-num-color); /* Use a distinct color for keys */
-    text-align: right;
-}
-
-.shortcut-desc {
-    color: var(--text-color);
-}
-
-.sudoku-strategy {
-    text-align: left; /* Align text to left */
-    margin-top: 20px;
-    line-height: 1.5;
-}
-
-.sudoku-strategy h4 {
-    margin-top: 15px;
-    margin-bottom: 5px;
-    color: var(--text-color);
-}
-
-.sudoku-strategy ul {
-    list-style-type: disc; /* Keep bullet points for strategy */
-    margin-left: 20px;
-    padding-left: 0;
-}
-
-.sudoku-strategy li {
-    margin-bottom: 5px;
-}
-
-
-
-
-/* Landscape styles */
-@media (orientation: landscape) {
-    body {
-        flex-direction: row; /* Arrange board and controls side-by-side */
-        justify-content: center;
-        align-items: flex-start; /* Align items to the top */
-        padding: 20px; /* Add some padding */
-    }
-
-    #main-content {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 20px; /* Space between board and controls */
-    }
-
-    #sudoku-board {
-        width: auto;
-        max-width: 70vh; /* Adjust based on viewport height */
-        height: 70vh;
-        margin-top: 0; /* Remove top margin in landscape */
-    }
-
-    #controls-sidebar {
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center; /* Center items within sidebar */
-        margin-left: 20px;
-        width: auto;
-        max-width: none;
-        gap: 10px; /* Space between elements in sidebar */
-    }
-
+@media (orientation: portrait) {
     #number-palette {
-        grid-template-columns: repeat(3, 1fr); /* 3 columns for numbers */
+        grid-template-columns: repeat(4, 1fr) auto; /* 4 columns for matrix, auto for new column */
+        grid-template-rows: repeat(4, auto);
         grid-template-areas:
-            "undo redo pencil"
-            "num1 num2 num3"
-            "num4 num5 num6"
-            "num7 num8 num9"
-            "hint check backspace"
-            "restart help pen";
-        max-width: none;
-        /* margin-top: 0; Removed, handled by controls-sidebar gap */
+            "num1 num2 num3 pencil help"
+            "num4 num5 num6 pen ."
+            "num7 num8 num9 backspace ."
+            "hint undo redo check restart";
+    }
+    h1 {
+        display: flex;
+        justify-content: center;
+        width: 100%;
     }
 
-    .palette-number, button.palette-icon {
-        min-width: 80px;
-        height: 50px;
-        font-size: 1.8em;
+    #game-controls {
+        display: flex;
+        justify-content: center;
     }
 
-    #action-controls {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-top: 10px; /* Add some space below palette */
+    #timer {
+        display: flex;
+        justify-content: center;
+        width: 100%;
     }
-
-    h1, #game-controls, #timer, #status {
-        display: block; /* Show these elements in landscape */
-        margin-top: 0; /* Ensure no extra top margin */
-    }
-}
-
-.cell {
-    border: 1px solid var(--cell-border-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--cell-bg-color);
-    position: relative;
-    box-sizing: border-box; /* Ensure consistent sizing */
-}
-
-.cell.original {
-    font-weight: bold;
-    background-color: var(--original-cell-bg-color);
-    font-size: clamp(1.9em, 4vw, 2.4em); /* Specific font size for original numbers */
-}
-
-.cell.user-entered {
-    font-size: clamp(2.0em, 4.5vw, 2.7em); /* Larger font for user-entered numbers, another 20% bigger */
-    background-color: var(--cell-bg-color);
-}
-
-@media (min-width: 800px) and (max-width: 1280px) and (orientation: portrait) {
-    .cell.original {
-        font-size: clamp(2.2em, 6vw, 2.8em);
-    }
-    .cell.user-entered {
-        font-size: clamp(2.3em, 6.5vw, 3.0em);
-    }
-}
-
-.pencil-mark {
-    font-size: 0.85em; /* Reverted to previous state as per user instruction */
-    color: var(--pencil-mark-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center; /* Explicitly center text */
-    box-sizing: border-box; /* Ensure consistent sizing */
-    line-height: 1; /* Minimize vertical space */
-}
-
-.pencil-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-    grid-template-rows: repeat(3, 1fr); /* 3 equal rows */
-    width: 100%; /* Take full width of parent cell */
-    height: 100%; /* Take full height of parent cell */
-}
-
-.cell.selected {
-    background-color: var(--selected-cell-bg-color);
-}
-
-.cell.highlighted {
-    background-color: var(--highlighted-cell-bg-color);
-}
-
-.cell.error {
-    background-color: var(--error-cell-bg-color);
-    border: 2px solid #000080;
-}
-
-.cell:nth-child(3n) {
-    border-right: 2px solid var(--board-border-color);
-}
-.cell:nth-child(9n) {
-    border-right: none;
-}
-
-#sudoku-board > .cell:nth-child(n+19):nth-child(-n+27),
-#sudoku-board > .cell:nth-child(n+46):nth-child(-n+54) {
-    border-bottom: 2px solid var(--board-border-color);
-}
-
-    .palette-number, button.palette-icon {
-        min-width: 60px; /* Force wider cells */
-        height: 40px; /* Reduce height */
-        font-size: 1.5em; /* Adjust font size for numbers */
-    }
-
-button.palette-icon {
-    font-family: 'Material Symbols Outlined';
-    font-size: 2em;
-    color: var(--text-color);
-}
-
-.palette-number.selected, .palette-icon.selected {
-    background-color: var(--selected-cell-bg-color);
-}
-
-button.palette-icon.active-icon {
-    background-color: var(--active-btn-bg-color) !important;
-}
-
-.eraser {
-    font-size: 0.8em;
-}
-
-#timer {
-    font-size: 1.8em;
-    font-weight: bold;
-    margin-top: 2px; /* Further reduce space above timer */
-    color: var(--text-color);
-}
-
-#action-controls {
-    margin-top: 13px;
-    margin-bottom: 2px !important; /* Explicitly remove bottom margin with !important */
-    display: block; /* Ensure block-level behavior */
-    overflow: hidden; /* Prevent margin collapsing */
-}
-
-#status {
-    margin-top: 2px !important;
-    font-weight: bold;
-    padding: 2px 15px; /* Reduce top padding */
-    border-radius: 5px;
-    line-height: 1; /* Minimize vertical space */
-    display: block; /* Ensure block-level behavior */
-}
-
-#game-controls {
-    margin-top: 2px; /* Further reduce space above game controls */
 }
 
 #new-game {
-    padding: 12px 25px; /* Increase button size */
-    font-size: 1.2em; /* Increase font size */
+    padding: 12px 25px;
+    font-size: 1.2em;
     cursor: pointer;
     background-color: var(--new-game-btn-bg);
     color: white;
@@ -713,9 +329,9 @@ button.palette-icon.active-icon {
     border: 1px solid var(--modal-border-color);
     width: 80%;
     max-width: 500px;
-    text-align: center; /* Center content */
-    max-height: 80vh; /* Make it scrollable */
-    overflow-y: auto; /* Enable vertical scrolling */
+    text-align: center;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 #solved-modal .modal-content h2 {
@@ -775,9 +391,9 @@ button.palette-icon.active-icon {
 
 .keyboard-shortcuts-grid {
     display: grid;
-    grid-template-columns: auto 1fr; /* Key and Icon on left, Description on right */
-    gap: 5px 15px; /* Row and column gap */
-    text-align: left; /* Align text to left */
+    grid-template-columns: auto 1fr;
+    gap: 5px 15px;
+    text-align: left;
     margin-top: 15px;
     margin-bottom: 20px;
 }
@@ -785,19 +401,18 @@ button.palette-icon.active-icon {
 .shortcut-key-icon {
     display: flex;
     align-items: center;
-    gap: 5px; /* Space between key and icon */
+    gap: 5px;
 }
 
 .shortcut-item .material-symbols-outlined {
-    font-size: 1.2em; /* Adjust icon size */
-    vertical-align: middle; /* Align icon with text */
-    /* margin-right: 5px; Removed as gap handles spacing */
-    color: var(--text-color); /* Use text color for icons */
+    font-size: 1.2em;
+    vertical-align: middle;
+    color: var(--text-color);
 }
 
 .shortcut-key {
     font-weight: bold;
-    color: var(--user-num-color); /* Use a distinct color for keys */
+    color: var(--user-num-color);
     text-align: right;
 }
 
@@ -806,7 +421,7 @@ button.palette-icon.active-icon {
 }
 
 .sudoku-strategy {
-    text-align: left; /* Align text to left */
+    text-align: left;
     margin-top: 20px;
     line-height: 1.5;
 }
@@ -818,7 +433,7 @@ button.palette-icon.active-icon {
 }
 
 .sudoku-strategy ul {
-    list-style-type: disc; /* Keep bullet points for strategy */
+    list-style-type: disc;
     margin-left: 20px;
     padding-left: 0;
 }
@@ -826,5 +441,3 @@ button.palette-icon.active-icon {
 .sudoku-strategy li {
     margin-bottom: 5px;
 }
-
-
