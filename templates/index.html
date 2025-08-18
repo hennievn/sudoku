@@ -17,31 +17,33 @@
             </div>
             <div id="timer">00:00</div>
         </div>
-        <div id="sudoku-board"></div>
-        <div id="controls-sidebar">
-            <div id="number-palette">
-                <button class="palette-icon material-symbols-outlined palette-button" id="undo-button" style="grid-area: undo;">undo</button>
-                <button class="palette-icon material-symbols-outlined palette-button" id="hint-button" onclick="getHints()" style="grid-area: hint;">transition_dissolve</button>
-                <div class="palette-number" style="grid-area: num1;">1</div>
-                <div class="palette-number" style="grid-area: num2;">2</div>
-                <div class="palette-number" style="grid-area: num3;">3</div>
-                <button class="palette-icon material-symbols-outlined palette-button" id="pencil-icon" style="grid-area: pencil;">draw</button>
+        <div id="game-area">
+            <div id="sudoku-board"></div>
+            <div id="controls-sidebar">
+                <div id="number-palette">
+                    <button class="palette-icon material-symbols-outlined palette-button" id="undo-button" style="grid-area: undo;">undo</button>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="hint-button" style="grid-area: hint;">transition_dissolve</button>
+                    <div class="palette-number" style="grid-area: num1;">1</div>
+                    <div class="palette-number" style="grid-area: num2;">2</div>
+                    <div class="palette-number" style="grid-area: num3;">3</div>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="pencil-icon" style="grid-area: pencil;">draw</button>
 
-                <button class="palette-icon material-symbols-outlined palette-button" id="redo-button" style="grid-area: redo;">redo</button>
-                <button class="palette-icon material-symbols-outlined palette-button" id="check-button" onclick="checkSolution()" style="grid-area: check;">check_circle</button>
-                <div class="palette-number" style="grid-area: num4;">4</div>
-                <div class="palette-number" style="grid-area: num5;">5</div>
-                <div class="palette-number" style="grid-area: num6;">6</div>
-                <button class="palette-icon material-symbols-outlined palette-button" id="pen-icon" style="grid-area: pen;">ink_pen</button>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="redo-button" style="grid-area: redo;">redo</button>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="check-button" style="grid-area: check;">check_circle</button>
+                    <div class="palette-number" style="grid-area: num4;">4</div>
+                    <div class="palette-number" style="grid-area: num5;">5</div>
+                    <div class="palette-number" style="grid-area: num6;">6</div>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="pen-icon" style="grid-area: pen;">ink_pen</button>
 
-                <button class="palette-icon material-symbols-outlined palette-button" id="help" onclick="showHelp()" style="grid-area: help;">help</button>
-                <button class="palette-icon material-symbols-outlined palette-button" id="restart-button" onclick="restartGame()" style="grid-area: restart;">restart_alt</button>
-                <div class="palette-number" style="grid-area: num7;">7</div>
-                <div class="palette-number" style="grid-area: num8;">8</div>
-                <div class="palette-number" style="grid-area: num9;">9</div>
-                <button class="palette-icon material-symbols-outlined palette-button" id="backspace-icon" style="grid-area: backspace;">backspace</button>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="help" style="grid-area: help;">help</button>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="restart-button" style="grid-area: restart;">restart_alt</button>
+                    <div class="palette-number" style="grid-area: num7;">7</div>
+                    <div class="palette-number" style="grid-area: num8;">8</div>
+                    <div class="palette-number" style="grid-area: num9;">9</div>
+                    <button class="palette-icon material-symbols-outlined palette-button" id="backspace-icon" style="grid-area: backspace;">backspace</button>
+                </div>
+                <p id="status"></p>
             </div>
-            <p id="status"></p>
         </div>
     </div>
 

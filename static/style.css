@@ -79,7 +79,8 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     position: relative;
-    padding: 10px; /* Add some padding for portrait */
+    padding: 10px;
+    min-height: 100vh; /* Ensure body takes full viewport height */
 }
 
 #theme-toggle {
@@ -118,6 +119,28 @@ h1 {
     text-align: center;
 }
 
+/* Main layout for Portrait */
+#main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#top-right-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#game-area {
+    display: flex;
+    flex-direction: column; /* Board on top, controls below */
+    align-items: center;
+    width: 100%;
+}
+
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
@@ -129,35 +152,30 @@ h1 {
     aspect-ratio: 1 / 1;
 }
 
+#controls-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90vw;
+    max-width: 500px;
+}
+
 #number-palette {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto auto auto auto auto;
+    grid-template-columns: repeat(4, 1fr) auto; /* 4 columns for matrix, auto for new column */
+    grid-template-rows: repeat(4, auto);
+    grid-template-areas:
+        "num1 num2 num3 pencil help"
+        "num4 num5 num6 pen ."
+        "num7 num8 num9 backspace ."
+        "hint undo redo check restart";
     row-gap: 10px;
     column-gap: 15px;
     margin-top: 10px;
     max-width: 500px;
-    grid-template-areas:
-        "undo redo pencil"
-        "num1 num2 num3"
-        "num4 num5 num6"
-        "num7 num8 num9"
-        "hint check backspace"
-        "restart help pen";
 }
 
-.palette-number:disabled, button.palette-icon:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-#right-sidebar {
-    display: none; /* Hidden by default in portrait */
-}
-
-
-
-/* Common styles for both orientations */
+/* Common styles for cells */
 .cell {
     border: 1px solid var(--cell-border-color);
     display: flex;
@@ -250,6 +268,11 @@ button.palette-icon {
     color: var(--text-color);
 }
 
+.palette-number:disabled, button.palette-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .palette-number.selected, .palette-icon.selected {
     background-color: var(--selected-cell-bg-color);
 }
@@ -269,31 +292,77 @@ button.palette-icon.active-icon {
     overflow: hidden;
 }
 
-@media (orientation: portrait) {
-    #number-palette {
-        grid-template-columns: repeat(4, 1fr) auto; /* 4 columns for matrix, auto for new column */
-        grid-template-rows: repeat(4, auto);
-        grid-template-areas:
-            "num1 num2 num3 pencil help"
-            "num4 num5 num6 pen ."
-            "num7 num8 num9 backspace ."
-            "hint undo redo check restart";
+/* Landscape Mode Styles */
+@media (orientation: landscape) {
+    body {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 10px;
     }
+
+    #main-content {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        width: auto;
+        height: 100%;
+    }
+
+    #top-right-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-right: 20px;
+        width: auto;
+        height: 100%;
+        justify-content: space-between;
+    }
+
     h1 {
-        display: flex;
-        justify-content: center;
-        width: 100%;
+        margin-top: 0;
     }
 
-    #game-controls {
-        display: flex;
-        justify-content: center;
+    #game-area {
+        flex-direction: row; /* Board next to controls */
+        align-items: flex-start;
+        width: auto;
+        height: 100%;
     }
 
-    #timer {
-        display: flex;
-        justify-content: center;
-        width: 100%;
+    #sudoku-board {
+        width: auto;
+        height: 80vh; /* Adjust board size for landscape */
+        max-height: 600px;
+        aspect-ratio: 1 / 1;
+        margin-top: 0;
+        margin-right: 20px;
+    }
+
+    #controls-sidebar {
+        width: auto;
+        height: 100%;
+        max-width: 300px; /* Limit sidebar width */
+        justify-content: space-between;
+    }
+
+    #number-palette {
+        grid-template-columns: repeat(3, 1fr); /* More compact for landscape sidebar */
+        grid-template-rows: auto;
+        grid-template-areas:
+            "num1 num2 num3"
+            "num4 num5 num6"
+            "num7 num8 num9"
+            "pencil pen backspace"
+            "undo redo hint"
+            "check restart help";
+        row-gap: 5px;
+        column-gap: 5px;
+        margin-top: 0;
+        max-width: none;
+    }
+
+    #status {
+        margin-top: 10px !important;
     }
 }
 
