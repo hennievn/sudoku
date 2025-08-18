@@ -36,7 +36,11 @@ async def read_root(request: Request) -> HTMLResponse:
 
 @app.get("/api/new-game")
 async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[List[int]]]:
-    game = SudokuGame(difficulty=difficulty.value)
+    try:
+        game = SudokuGame(difficulty=difficulty.value)
+    # Consider refining this to catch more specific exceptions from SudokuGame if they are introduced.
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate new Sudoku puzzle: {e}")
     return {
         "board": game.board.tolist(),
         "original_board": game.original_board.tolist(),
@@ -49,8 +53,8 @@ async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]
     all_marks: List[List[set]] = SudokuGame.get_all_possible_marks(board)
 
     # Remove manual removals from hints
-    for r in range(9):
-        for c in range(9):
+    for r in range(SudokuGame.GRID_SIZE):
+        for c in range(SudokuGame.GRID_SIZE):
             all_marks[r][c] -= set(hint_request.manual_removals[r][c])
 
     # Convert sets to lists for JSON serialization

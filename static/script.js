@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
 
     // Game state
+    const GRID_SIZE = 9; // New constant
     let board = [];
     let originalBoard = [];
     let solution = [];
@@ -32,10 +33,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval;
     let startTime;
     let errorCells = [];
+    let conflictCells = []; // New: for real-time conflicts
 
     let history = [];
     let historyPointer = -1;
     const MAX_HISTORY_SIZE = 20; // As discussed, 20 steps
+
+    let isLoading = false; // New: Loading state
+
+    // Helper to manage loading state
+    function setLoading(loading) {
+        isLoading = loading;
+        newGameBtn.disabled = loading;
+        hintBtn.disabled = loading;
+        checkSolutionBtn.disabled = loading;
+        restartBtn.disabled = loading;
+        easyDifficultyBtn.disabled = loading;
+        mediumDifficultyBtn.disabled = loading;
+        hardDifficultyBtn.disabled = loading;
+        // Add other buttons that should be disabled during loading
+        if (loading) {
+            setStatusMessage('Loading...', 'info');
+        } else {
+            // Clear loading message if not replaced by another status
+            if (statusElement.textContent === 'Loading...') {
+                setStatusMessage('');
+            }
+        }
+    }
 
     // Functions
     function toggleTheme() {
@@ -72,8 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkErrors() {
         errorCells = [];
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
                 if (originalBoard[r][c] === 0 && board[r][c] !== 0) {
                     if (board[r][c] !== solution[r][c]) {
                         errorCells.push([r, c]);
@@ -84,12 +109,49 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBoard();
     }
 
+    // New: Check for real-time conflicts
+    function checkConflicts(row, col, num) {
+        conflictCells = [];
+        if (num === 0) return; // No conflict if cell is empty
+
+        // Check row
+        for (let c = 0; c < GRID_SIZE; c++) {
+            if (c !== col && board[row][c] === num) {
+                conflictCells.push([row, c]);
+            }
+        }
+
+        // Check column
+        for (let r = 0; r < GRID_SIZE; r++) {
+            if (r !== row && board[r][col] === num) {
+                conflictCells.push([r, col]);
+            }
+        }
+
+        // Check 3x3 block
+        const startRow = Math.floor(row / 3) * 3;
+        const startCol = Math.floor(col / 3) * 3;
+        for (let r = startRow; r < startRow + 3; r++) {
+            for (let c = startCol; c < startCol + 3; c++) {
+                if (r !== row && c !== col && board[r][c] === num) {
+                    conflictCells.push([r, c]);
+                }
+            }
+        }
+
+        // Add the current cell if it's part of a conflict
+        if (conflictCells.length > 0) {
+            conflictCells.push([row, col]);
+        }
+    }
+
+
     function initPencilMarks() {
-        pencilMarks = Array(9).fill(0).map(() => Array(9).fill(0).map(() => new Set()));
+        pencilMarks = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0).map(() => new Set()));
     }
 
     function initManualRemovals() {
-        manualRemovals = Array(9).fill(0).map(() => Array(9).fill(0).map(() => new Set()));
+        manualRemovals = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0).map(() => new Set()));
     }
 
     function saveState() {
@@ -117,6 +179,50 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUndoRedoButtons();
     }
 
+    // Refactored drawBoard helpers
+    function createCellElement(r, c) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.addEventListener('click', () => selectCell(cell, r, c));
+        return cell;
+    }
+
+    function renderCellContent(cell, r, c) {
+        if (originalBoard[r][c] !== 0) {
+            cell.textContent = originalBoard[r][c];
+        } else if (board[r][c] !== 0) {
+            cell.textContent = board[r][c];
+        } else if (pencilMarks[r][c].size > 0) {
+            const pencilContainer = document.createElement('div');
+            pencilContainer.classList.add('pencil-grid');
+            for (let i = 1; i <= GRID_SIZE; i++) {
+                const mark = document.createElement('div');
+                mark.classList.add('pencil-mark');
+                if (pencilMarks[r][c].has(i)) {
+                    mark.textContent = i;
+                }
+                pencilContainer.appendChild(mark);
+            }
+            cell.appendChild(pencilContainer);
+        }
+    }
+
+    function applyCellClasses(cell, r, c) {
+        if (errorCells.some(err => err[0] === r && err[1] === c)) {
+            cell.classList.add('error');
+        }
+        if (conflictCells.some(conf => conf[0] === r && conf[1] === c)) {
+            cell.classList.add('conflict'); // New conflict class
+        }
+        if (originalBoard[r][c] !== 0) {
+            cell.classList.add('original');
+        } else if (board[r][c] !== 0) {
+            cell.classList.add('user-entered');
+        }
+    }
+
     function drawBoard() {
         const boardState = {
             selectedRow: selectedCell ? parseInt(selectedCell.dataset.row) : -1,
@@ -124,38 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         boardElement.innerHTML = '';
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.dataset.row = r;
-                cell.dataset.col = c;
-
-                if (errorCells.some(err => err[0] === r && err[1] === c)) {
-                    cell.classList.add('error');
-                }
-
-                if (originalBoard[r][c] !== 0) {
-                    cell.textContent = originalBoard[r][c];
-                    cell.classList.add('original');
-                } else if (board[r][c] !== 0) {
-                    cell.textContent = board[r][c];
-                    cell.classList.add('user-entered');
-                } else if (pencilMarks[r][c].size > 0) {
-                    const pencilContainer = document.createElement('div');
-                    pencilContainer.classList.add('pencil-grid');
-                    for (let i = 1; i <= 9; i++) {
-                        const mark = document.createElement('div');
-                        mark.classList.add('pencil-mark');
-                        if (pencilMarks[r][c].has(i)) {
-                            mark.textContent = i;
-                        }
-                        pencilContainer.appendChild(mark);
-                    }
-                    cell.appendChild(pencilContainer);
-                }
-
-                cell.addEventListener('click', () => selectCell(cell, r, c));
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                const cell = createCellElement(r, c);
+                renderCellContent(cell, r, c);
+                applyCellClasses(cell, r, c);
                 boardElement.appendChild(cell);
             }
         }
@@ -175,8 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlighted'));
 
         if (number && number !== 0) {
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < 9; c++) {
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
                     const currentNum = board[r][c] || originalBoard[r][c];
                     if (currentNum === number) {
                         boardElement.querySelector(`[data-row='${r}'][data-col='${c}']`).classList.add('highlighted');
@@ -199,9 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function newGame(difficulty) {
         difficultyModal.style.display = 'none';
+        setLoading(true); // Set loading state
         setStatusMessage(`Generating ${difficulty} puzzle...`, 'info');
         selectedCell = null;
         updateHighlights(null);
+        errorCells = []; // Clear errors on new game
+        conflictCells = []; // Clear conflicts on new game
         try {
             const response = await fetch(`/api/new-game?difficulty=${difficulty}`);
             if (!response.ok) {
@@ -223,6 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error starting new game:', error);
             setStatusMessage(`Failed to start new game: ${error.message}`, 'error');
+        } finally {
+            setLoading(false); // Clear loading state
         }
     }
 
@@ -232,6 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
         initManualRemovals();
         selectedCell = null;
         updateHighlights(null);
+        errorCells = []; // Clear errors on restart
+        conflictCells = []; // Clear conflicts on restart
         drawBoard();
         saveState(); // Save state after restart
         setStatusMessage('Game restarted.', 'info');
@@ -250,32 +336,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // New: Helper for pencil mark toggling
+    function togglePencilMark(r, c, value) {
+        if (pencilMarks[r][c].has(value)) {
+            pencilMarks[r][c].delete(value);
+            manualRemovals[r][c].add(value);
+        } else {
+            pencilMarks[r][c].add(value);
+            manualRemovals[r][c].delete(value);
+        }
+        board[r][c] = 0; // Clear main value if pencil marking
+    }
+
     async function getHints() {
+        setLoading(true); // Set loading state
         const removalsAsArrays = manualRemovals.map(row => row.map(s => Array.from(s)));
-        const response = await fetch('/api/get-hints', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ board: board, manual_removals: removalsAsArrays }),
-        });
-        const data = await response.json();
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                if (board[r][c] === 0) {
-                    pencilMarks[r][c] = new Set(data.hints[r][c]);
+        try {
+            const response = await fetch('/api/get-hints', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ board: board, manual_removals: removalsAsArrays }),
+            });
+            const data = await response.json();
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    if (board[r][c] === 0) {
+                        pencilMarks[r][c] = new Set(data.hints[r][c]);
+                    }
                 }
             }
+            drawBoard();
+            saveState(); // Save state after hints are loaded
+            setStatusMessage('Hints loaded.', 'info');
+        } catch (error) {
+            console.error('Error getting hints:', error);
+            setStatusMessage(`Failed to get hints: ${error.message}`, 'error');
+        } finally {
+            setLoading(false); // Clear loading state
         }
-        drawBoard();
-        saveState(); // Save state after hints are loaded
-        setStatusMessage('Hints loaded.', 'info');
     }
 
     function checkSolution() {
         let isCorrect = true;
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
                 if (board[r][c] !== solution[r][c]) {
                     isCorrect = false;
                     break;
@@ -288,6 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatusMessage('Congratulations! You solved it!', 'success');
             stopTimer();
             errorCells = [];
+            conflictCells = []; // Clear conflicts on solved
             drawBoard();
             solvedModal.style.display = 'block';
         } else {
@@ -306,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = parseInt(selectedCell.dataset.col);
         if (originalBoard[r][c] !== 0) return;
         errorCells = [];
+        conflictCells = []; // Clear conflicts on key press
         if (e.key >= '1' && e.key <= '9') {
             handleCellInput(parseInt(e.key));
         } else if (e.key === 'Backspace' || e.key === 'Delete') {
@@ -319,6 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = parseInt(selectedCell.dataset.col);
         if (originalBoard[r][c] !== 0) return;
         errorCells = [];
+        conflictCells = []; // Clear conflicts before re-evaluating
 
         if (isBackspace) {
             board[r][c] = 0;
@@ -326,20 +435,19 @@ document.addEventListener('DOMContentLoaded', () => {
             manualRemovals[r][c].clear();
         } else {
             if (pencilMode) {
-                if (pencilMarks[r][c].has(value)) {
-                    pencilMarks[r][c].delete(value);
-                    manualRemovals[r][c].add(value);
-                } else {
-                    pencilMarks[r][c].add(value);
-                    manualRemovals[r][c].delete(value);
-                }
-                board[r][c] = 0;
+                togglePencilMark(r, c, value); // Use helper
             } else {
                 board[r][c] = value;
                 pencilMarks[r][c].clear();
             }
         }
-        checkErrors();
+
+        // Check for conflicts after input
+        if (board[r][c] !== 0) {
+            checkConflicts(r, c, board[r][c]);
+        }
+
+        checkErrors(); // Still check against solution for 'error' class
         drawBoard();
         updateHighlights(board[r][c]);
         saveState();
@@ -357,6 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
         board = state.board.map(row => [...row]);
         pencilMarks = state.pencilMarks.map(row => row.map(set => new Set(set)));
         manualRemovals = state.manualRemovals.map(row => row.map(set => new Set(set)));
+        errorCells = []; // Clear errors on undo/redo
+        conflictCells = []; // Clear conflicts on undo/redo
         drawBoard();
     }
 
@@ -381,10 +491,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const redoButton = document.getElementById('redo-button');
 
         if (undoButton) {
-            undoButton.disabled = historyPointer <= 0;
+            undoButton.disabled = historyPointer <= 0 || isLoading; // Disable if loading
         }
         if (redoButton) {
-            redoButton.disabled = historyPointer >= history.length - 1;
+            redoButton.disabled = historyPointer >= history.length - 1 || isLoading; // Disable if loading
         }
     }
 
@@ -400,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggle.addEventListener('click', toggleTheme);
 
     document.addEventListener('keydown', (e) => {
+        if (isLoading) return; // Prevent input when loading
         switch (e.key.toLowerCase()) {
             case 'n': difficultyModal.style.display = 'block'; break;
             case 'r': restartGame(); break;
@@ -416,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
     numberPalette.querySelectorAll('.palette-number').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            if (!selectedCell) return;
+            if (!selectedCell || isLoading) return; // Prevent input when loading
             const numEntered = parseInt(button.textContent);
             handleCellInput(numEntered);
         });
@@ -424,11 +535,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     pencilIcon.addEventListener('click', (e) => {
         e.preventDefault();
+        if (isLoading) return; // Prevent input when loading
         togglePencilMode();
     });
 
     penIcon.addEventListener('click', (e) => {
         e.preventDefault();
+        if (isLoading) return; // Prevent input when loading
         if (pencilMode) {
             togglePencilMode();
         }
@@ -436,21 +549,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     backspaceIcon.addEventListener('click', (e) => {
         e.preventDefault();
-        if (!selectedCell) return;
+        if (!selectedCell || isLoading) return; // Prevent input when loading
         handleCellInput(0, true);
     });
 
     newGameBtn.addEventListener('click', () => {
+        if (isLoading) return; // Prevent multiple clicks
         difficultyModal.style.display = 'block';
     });
 
-    easyDifficultyBtn.addEventListener('click', () => newGame('easy'));
-    mediumDifficultyBtn.addEventListener('click', () => newGame('medium'));
-    hardDifficultyBtn.addEventListener('click', () => newGame('hard'));
+    easyDifficultyBtn.addEventListener('click', () => { if (!isLoading) newGame('easy'); });
+    mediumDifficultyBtn.addEventListener('click', () => { if (!isLoading) newGame('medium'); });
+    hardDifficultyBtn.addEventListener('click', () => { if (!isLoading) newGame('hard'); });
 
-    restartBtn.addEventListener('click', restartGame);
-    hintBtn.addEventListener('click', getHints);
-    checkSolutionBtn.addEventListener('click', checkSolution);
+    restartBtn.addEventListener('click', () => { if (!isLoading) restartGame(); });
+    hintBtn.addEventListener('click', () => { if (!isLoading) getHints(); });
+    checkSolutionBtn.addEventListener('click', () => { if (!isLoading) checkSolution(); });
     helpBtn.addEventListener('click', showHelp);
     closeModalBtn.addEventListener('click', hideHelp);
 
@@ -460,13 +574,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (event.target == solvedModal) {
             solvedModal.style.display = 'none';
-            difficultyModal.style.display = 'block';
+            if (!isLoading) difficultyModal.style.display = 'block'; // Only show if not loading
         }
     });
 
     newGameSolvedBtn.addEventListener('click', () => {
         solvedModal.style.display = 'none';
-        difficultyModal.style.display = 'block';
+        if (!isLoading) difficultyModal.style.display = 'block'; // Only show if not loading
     });
 
     const undoButton = document.getElementById('undo-button');
@@ -484,4 +598,5 @@ document.addEventListener('DOMContentLoaded', () => {
     penIcon.classList.add('active-icon');
     pencilIcon.classList.remove('active-icon');
     updateUndoRedoButtons();
+    setLoading(false); // Ensure initial state is not loading
 });

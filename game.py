@@ -8,6 +8,8 @@ from typing import Optional, Tuple, List, Set, Dict
 class SudokuGame:
     """Handles the core logic of a Sudoku game."""
 
+    GRID_SIZE: int = 9
+    BLOCK_SIZE: int = 3
     DIFFICULTY_LEVELS: Dict[str, int] = {"easy": 43, "medium": 51, "hard": 62}  # Moved to class constant
 
     board: np.ndarray
@@ -26,12 +28,12 @@ class SudokuGame:
         board: np.ndarray = self.generate_solved_board()
         squares_to_remove: int = self.DIFFICULTY_LEVELS.get(self.difficulty, 51)
 
-        cells: List[Tuple[int, int]] = [(r, c) for r in range(9) for c in range(9)]
+        cells: List[Tuple[int, int]] = [(r, c) for r in range(self.GRID_SIZE) for c in range(self.GRID_SIZE)]
         random.shuffle(cells)
 
         # --- Timeout logic ---
         start_time: float = time.time()
-        timeout: float = 4.0  # seconds
+        timeout: float = 20.0  # seconds
 
         squares_removed: int = 0
         for r, c in cells:
@@ -55,7 +57,7 @@ class SudokuGame:
         return board
 
     def generate_solved_board(self) -> np.ndarray:
-        board: np.ndarray = np.zeros((9, 9), dtype=int)
+        board: np.ndarray = np.zeros((self.GRID_SIZE, self.GRID_SIZE), dtype=int)
         self.solve_sudoku(board, randomize=True)
         return board
 
@@ -78,7 +80,7 @@ class SudokuGame:
                 solutions_list.append(board.copy())
             return True
         row, col = empty
-        nums: List[int] = list(range(1, 10))
+        nums: List[int] = list(range(1, self.GRID_SIZE + 1))
         if randomize:
             random.shuffle(nums)
         for num in nums:
@@ -106,8 +108,8 @@ class SudokuGame:
             return False
         if num in board[:, col]:
             return False
-        start_row, start_col = 3 * (row // 3), 3 * (col // 3)
-        if num in board[start_row : start_row + 3, start_col : start_col + 3]:
+        start_row, start_col = self.BLOCK_SIZE * (row // self.BLOCK_SIZE), self.BLOCK_SIZE * (col // self.BLOCK_SIZE)
+        if num in board[start_row : start_row + self.BLOCK_SIZE, start_col : start_col + self.BLOCK_SIZE]:
             return False
         return True
 
@@ -116,14 +118,14 @@ class SudokuGame:
 
     @staticmethod
     def get_all_possible_marks(board: np.ndarray) -> List[List[Set[int]]]:
-        all_marks: List[List[Set[int]]] = [[set() for _ in range(9)] for _ in range(9)]
-        for r in range(9):
-            for c in range(9):
+        all_marks: List[List[Set[int]]] = [[set() for _ in range(SudokuGame.GRID_SIZE)] for _ in range(SudokuGame.GRID_SIZE)]
+        for r in range(SudokuGame.GRID_SIZE):
+            for c in range(SudokuGame.GRID_SIZE):
                 if board[r, c] == 0:
-                    possible: Set[int] = set(range(1, 10))
+                    possible: Set[int] = set(range(1, SudokuGame.GRID_SIZE + 1))
                     possible -= set(board[r, :])
                     possible -= set(board[:, c])
-                    start_r, start_c = 3 * (r // 3), 3 * (c // 3)
-                    possible -= set(board[start_r:start_r+3, start_c:start_c+3].flatten())
+                    start_r, start_c = SudokuGame.BLOCK_SIZE * (r // SudokuGame.BLOCK_SIZE), SudokuGame.BLOCK_SIZE * (c // SudokuGame.BLOCK_SIZE)
+                    possible -= set(board[start_r:start_r+SudokuGame.BLOCK_SIZE, start_c:start_c+SudokuGame.BLOCK_SIZE].flatten())
                     all_marks[r][c] = possible
         return all_marks
