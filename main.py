@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import numpy as np
 from enum import Enum
+import logging
 
 from game import SudokuGame
 
@@ -37,9 +38,13 @@ async def read_root(request: Request) -> HTMLResponse:
 @app.get("/api/new-game")
 async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[List[int]]]:
     try:
+        logging.basicConfig(level=logging.INFO)
+        logging.info(f"Generating new game with difficulty: {difficulty.value}")
         game = SudokuGame(difficulty=difficulty.value)
+        logging.info("New game generated successfully")
     # Consider refining this to catch more specific exceptions from SudokuGame if they are introduced.
     except Exception as e:
+        logging.error(f"Error generating new game: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to generate new Sudoku puzzle: {e}")
     return {
         "board": game.board.tolist(),
@@ -49,15 +54,34 @@ async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[L
 
 @app.post("/api/get-hints")
 async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]]]:
-    board = np.array(hint_request.board)
-    all_marks: List[List[set]] = SudokuGame.get_all_possible_marks(board)
+    try:
+        logging.info("Getting hints using sudokutools...")
+        from sudokutools.sudoku import Sudoku
+        board = Sudoku(hint_request.board)
+        candidates = board.get_candidates()
 
-    # Remove manual removals from hints
-    for r in range(SudokuGame.GRID_SIZE):
-        for c in range(SudokuGame.GRID_SIZE):
-            all_marks[r][c] -= set(hint_request.manual_removals[r][c])
+        # Remove manual removals from hints
+        for r in range(board.size):
+            for c in range(board.size):
+                candidates[r][c] -= set(hint_request.manual_removals[r][c])
 
-    # Convert sets to lists for JSON serialization
-    serializable_hints = [[list(s) for s in row] for row in all_marks]
-            
-    return {"hints": serializable_hints}
+        # Convert sets to lists for JSON serialization
+        serializable_hints = [[list(s) for s in row] for row in candidates]
+        logging.info("Hints generated successfully.")
+        return {"hints": serializable_hints}
+    except Exception as e:
+        logging.error(f"Error getting hints: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to get hints: {e}")
+
+@app.post("/api/check-solution")
+async def check_solution(current_board: List[List[int]]) -> Dict[str, bool]:
+    try:
+        logging.info("Checking solution using sudokutools...")
+        from sudokutools.sudoku import Sudoku
+        board = Sudoku(current_board)
+        is_correct = board.is_solved()
+        logging.info(f"Solution check result: {is_correct}")
+        return {"is_correct": is_correct}
+    except Exception as e:
+        logging.error(f"Error checking solution: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to check solution: {e}")
