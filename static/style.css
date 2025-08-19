@@ -355,8 +355,8 @@ button.palette-icon.active-icon {
             "pencil pen backspace"
             "undo redo hint"
             "check restart help";
-        row-gap: 5px;
-        column-gap: 5px;
+        row-gap: 10px;
+        column-gap: 15px;
         margin-top: 0;
         max-width: none;
     }
