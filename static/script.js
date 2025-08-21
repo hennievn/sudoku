@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const penIcon = document.getElementById('pen-icon');
     const backspaceIcon = document.getElementById('backspace-icon');
     const themeToggle = document.getElementById('theme-toggle');
+    const loadingIndicator = document.getElementById('loading-indicator'); // New: Get loading indicator
 
     // Game state
     const GRID_SIZE = 9; // New constant
@@ -40,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_HISTORY_SIZE = 20; // As discussed, 20 steps
 
     let isLoading = false; // New: Loading state
+    let previousBoard = []; // New: Store previous board state for optimized rendering
+    let previousPencilMarks = []; // New: Store previous pencil marks for optimized rendering
 
     // Helper to manage loading state
     function setLoading(loading) {
@@ -53,8 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         hardDifficultyBtn.disabled = loading;
         // Add other buttons that should be disabled during loading
         if (loading) {
+            loadingIndicator.style.display = 'flex'; // Show spinner
             setStatusMessage('Loading...', 'info');
         } else {
+            loadingIndicator.style.display = 'none'; // Hide spinner
             // Clear loading message if not replaced by another status
             if (statusElement.textContent === 'Loading...') {
                 setStatusMessage('');
@@ -179,75 +184,135 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUndoRedoButtons();
     }
 
-    // Refactored drawBoard helpers
-    function createCellElement(r, c) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
-        cell.dataset.row = r;
-        cell.dataset.col = c;
-        cell.addEventListener('click', () => selectCell(cell, r, c));
-        return cell;
-    }
-
-    function renderCellContent(cell, r, c) {
-        if (originalBoard[r][c] !== 0) {
-            cell.textContent = originalBoard[r][c];
-        } else if (board[r][c] !== 0) {
-            cell.textContent = board[r][c];
-        } else if (pencilMarks[r][c].size > 0) {
-            const pencilContainer = document.createElement('div');
-            pencilContainer.classList.add('pencil-grid');
-            for (let i = 1; i <= GRID_SIZE; i++) {
-                const mark = document.createElement('div');
-                mark.classList.add('pencil-mark');
-                if (pencilMarks[r][c].has(i)) {
-                    mark.textContent = i;
-                }
-                pencilContainer.appendChild(mark);
-            }
-            cell.appendChild(pencilContainer);
-        }
-    }
-
-    function applyCellClasses(cell, r, c) {
-        if (errorCells.some(err => err[0] === r && err[1] === c)) {
-            cell.classList.add('error');
-        }
-        if (conflictCells.some(conf => conf[0] === r && conf[1] === c)) {
-            cell.classList.add('conflict'); // New conflict class
-        }
-        if (originalBoard[r][c] !== 0) {
-            cell.classList.add('original');
-        } else if (board[r][c] !== 0) {
-            cell.classList.add('user-entered');
-        }
-    }
-
     function drawBoard() {
+        console.time('drawBoard_total');
         const boardState = {
             selectedRow: selectedCell ? parseInt(selectedCell.dataset.row) : -1,
             selectedCol: selectedCell ? parseInt(selectedCell.dataset.col) : -1,
         };
 
-        boardElement.innerHTML = '';
-        for (let r = 0; r < GRID_SIZE; r++) {
-            for (let c = 0; c < GRID_SIZE; c++) {
-                const cell = createCellElement(r, c);
-                renderCellContent(cell, r, c);
-                applyCellClasses(cell, r, c);
-                boardElement.appendChild(cell);
+        // Initialize previousBoard and previousPencilMarks if this is the first draw
+        if (previousBoard.length === 0 || previousBoard[0].length === 0) { // Check for empty array or empty inner arrays
+            for (let r = 0; r < GRID_SIZE; r++) {
+                previousBoard.push(Array(GRID_SIZE).fill(0));
+                previousPencilMarks.push(Array(GRID_SIZE).fill(0).map(() => new Set()));
             }
         }
 
-        if (boardState.selectedRow !== -1) {
+        console.time('drawBoard_cell_loop');
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                let cellElement = boardElement.querySelector(`[data-row='${r}'][data-col='${c}']`);
+
+                // If cell doesn't exist, create it (first draw)
+                if (!cellElement) {
+                    console.time('drawBoard_create_cell');
+                    cellElement = document.createElement('div');
+                    cellElement.classList.add('cell');
+                    cellElement.dataset.row = r;
+                    cellElement.dataset.col = c;
+                    cellElement.addEventListener('click', () => selectCell(cellElement, r, c));
+                    boardElement.appendChild(cellElement);
+                    console.timeEnd('drawBoard_create_cell');
+                }
+
+                const currentVal = board[r][c];
+                const originalVal = originalBoard[r][c];
+                const currentPencilMarks = pencilMarks[r][c];
+
+                const prevVal = previousBoard[r][c];
+                const prevPencilMarks = previousPencilMarks[r][c];
+
+                // Check if content needs update
+                let contentChanged = false;
+                console.time('drawBoard_content_check');
+                if (originalVal !== 0) {
+                    if (cellElement.textContent !== String(originalVal) || cellElement.classList.contains('user-entered')) {
+                        cellElement.textContent = originalVal;
+                        contentChanged = true;
+                    }
+                } else if (currentVal !== 0) {
+                    if (cellElement.textContent !== String(currentVal) || cellElement.classList.contains('original') || cellElement.innerHTML.includes('div')) {
+                        cellElement.innerHTML = ''; // Explicitly clear the cell
+                        cellElement.textContent = currentVal;
+                        contentChanged = true;
+                    }
+                } else {
+                    // Check pencil marks
+                    const currentMarksArray = Array.from(currentPencilMarks).sort().join('');
+                    const prevMarksArray = Array.from(prevPencilMarks).sort().join('');
+
+                    if (currentMarksArray !== prevMarksArray || cellElement.textContent !== '') {
+                        cellElement.innerHTML = ''; // Clear existing content
+                        if (currentPencilMarks.size > 0) {
+                            const pencilContainer = document.createElement('div');
+                            pencilContainer.classList.add('pencil-grid');
+                            for (let i = 1; i <= GRID_SIZE; i++) {
+                                const mark = document.createElement('div');
+                                mark.classList.add('pencil-mark');
+                                if (currentPencilMarks.has(i)) {
+                                    mark.textContent = i;
+                                }
+                                pencilContainer.appendChild(mark);
+                            }
+                            cellElement.appendChild(pencilContainer);
+                        }
+                        contentChanged = true;
+                    }
+                }
+                console.timeEnd('drawBoard_content_check');
+
+                // Check if classes need update
+                let classesChanged = false;
+                const newClasses = new Set();
+                newClasses.add('cell'); // Always has 'cell' class
+
+                if (errorCells.some(err => err[0] === r && err[1] === c)) {
+                    newClasses.add('error');
+                }
+                if (conflictCells.some(conf => conf[0] === r && conf[1] === c)) {
+                    newClasses.add('conflict');
+                }
+                if (originalVal !== 0) {
+                    newClasses.add('original');
+                } else if (currentVal !== 0) {
+                    newClasses.add('user-entered');
+                }
+
+                // Compare current classes with newClasses
+                console.time('drawBoard_class_check');
+                const currentClasses = new Set(cellElement.classList);
+                if (currentClasses.size !== newClasses.size || ![...currentClasses].every(cls => newClasses.has(cls))) {
+                    cellElement.className = ''; // Clear all existing classes
+                    newClasses.forEach(cls => cellElement.classList.add(cls));
+                    classesChanged = true;
+                }
+                console.timeEnd('drawBoard_class_check');
+
+                // Update previous state for next render
+                previousBoard[r][c] = currentVal;
+                previousPencilMarks[r][c] = new Set(currentPencilMarks); // Deep copy Set
+            }
+        }
+        console.timeEnd('drawBoard_cell_loop');
+
+        // Handle selected cell and highlights
+        console.time('drawBoard_selection_highlight');
+        if (selectedCell) {
             const reselectedCell = boardElement.querySelector(`[data-row='${boardState.selectedRow}'][data-col='${boardState.selectedCol}']`);
             if (reselectedCell) {
+                selectedCell.classList.remove('selected'); // Remove from old selected
                 selectedCell = reselectedCell;
                 selectedCell.classList.add('selected');
                 const num = board[boardState.selectedRow][boardState.selectedCol] || originalBoard[boardState.selectedRow][boardState.selectedCol];
                 updateHighlights(num);
             }
+        } else {
+            // If no cell is selected, ensure no cells are highlighted
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected', 'highlighted'));
         }
+        console.timeEnd('drawBoard_selection_highlight');
+        console.timeEnd('drawBoard_total');
     }
 
     function updateHighlights(number) {
@@ -284,18 +349,26 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHighlights(null);
         errorCells = []; // Clear errors on new game
         conflictCells = []; // Clear conflicts on new game
+        console.time('newGame_total');
         try {
+            console.time('newGame_fetch');
             const response = await fetch(`/api/new-game?difficulty=${difficulty}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+            console.timeEnd('newGame_fetch');
+
             board = data.board;
             originalBoard = data.original_board;
             solution = data.solution;
             initPencilMarks();
             initManualRemovals();
+
+            console.time('newGame_drawBoard');
             drawBoard();
+            console.timeEnd('newGame_drawBoard');
+
             saveState();
             setStatusMessage('New game started.', 'info');
             startTimer();
@@ -307,6 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatusMessage(`Failed to start new game: ${error.message}`, 'error');
         } finally {
             setLoading(false); // Clear loading state
+            console.timeEnd('newGame_total');
         }
     }
 
@@ -359,10 +433,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ board: board, manual_removals: removalsAsArrays }),
             });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
+
+            if (!data || !data.hints || !Array.isArray(data.hints)) {
+                throw new Error('Invalid hints data received from server.');
+            }
+
             for (let r = 0; r < GRID_SIZE; r++) {
+                if (!Array.isArray(data.hints[r])) {
+                    console.error(`hints[${r}] is not an array:`, data.hints[r]);
+                    continue;
+                }
                 for (let c = 0; c < GRID_SIZE; c++) {
                     if (board[r][c] === 0) {
+                        if (!Array.isArray(data.hints[r][c])) {
+                            console.error(`hints[${r}][${c}] is not an array:`, data.hints[r][c]);
+                            continue;
+                        }
                         pencilMarks[r][c] = new Set(data.hints[r][c]);
                     }
                 }
