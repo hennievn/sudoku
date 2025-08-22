@@ -37,7 +37,7 @@
     --cell-bg-color: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
     --cell-border-color: rgb(80, 90, 90); /* Darker for inner grid lines */
     --original-num-color: rgb(173, 188, 188); /* Selenized Dark original */
-    --original-cell-bg-color: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
+    --original-cell-bg-color: #000; /* Black for pre-filled numbers in dark mode */
     --user-num-color: rgb(86, 182, 194); /* Selenized Dark user */
     --selected-cell-bg-color: rgb(60, 120, 130); /* Muted blue-green */
     --highlighted-cell-bg-color: rgb(60, 120, 130); /* Muted color for highlighted cell */
@@ -187,13 +187,13 @@ h1 {
 }
 
 .cell.original {
-    font-weight: bold;
+    font-weight: normal;
     background-color: var(--original-cell-bg-color);
     font-size: clamp(1.9em, 4vw, 2.4em);
 }
 
 .cell.user-entered {
-    font-size: clamp(2.0em, 4.5vw, 2.7em);
+    font-size: clamp(1.9em, 4vw, 2.4em);
     background-color: var(--cell-bg-color);
 }
 
@@ -324,7 +324,7 @@ button.palette-icon.active-icon {
 
     #game-area {
         flex-direction: row; /* Board next to controls */
-        align-items: flex-start;
+        align-items: flex-end; /* Align items to the bottom */
         width: auto;
         height: 100%;
     }
@@ -342,7 +342,7 @@ button.palette-icon.active-icon {
         width: auto;
         height: 100%;
         max-width: 300px; /* Limit sidebar width */
-        justify-content: space-between;
+        justify-content: flex-end;
     }
 
     #number-palette {

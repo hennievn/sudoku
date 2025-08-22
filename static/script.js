@@ -514,6 +514,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function isBoardComplete() {
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                if (originalBoard[r][c] === 0 && board[r][c] === 0) {
+                    return false; // Found an empty user-fillable cell
+                }
+            }
+        }
+        return true; // All user-fillable cells have a number
+    }
+
     function handleCellInput(value, isBackspace = false) {
         if (!selectedCell) return;
         const r = parseInt(selectedCell.dataset.row);
@@ -544,6 +555,11 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBoard();
         updateHighlights(board[r][c]);
         saveState();
+
+        // Automatic solution check if board is complete
+        if (isBoardComplete()) {
+            checkSolution();
+        }
     }
 
     function showHelp() {
@@ -590,6 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
             redoButton.disabled = historyPointer >= history.length - 1 || isLoading; // Disable if loading
         }
     }
+
+    const solvedModalCloseBtn = solvedModal.querySelector('.close-button');
 
     // Event Listeners
     const savedTheme = localStorage.getItem('theme');
@@ -661,13 +679,16 @@ document.addEventListener('DOMContentLoaded', () => {
     helpBtn.addEventListener('click', showHelp);
     closeModalBtn.addEventListener('click', hideHelp);
 
+    solvedModalCloseBtn.addEventListener('click', () => {
+        solvedModal.style.display = 'none';
+    });
+
     window.addEventListener('click', (event) => {
         if (event.target == helpModal) {
             hideHelp();
         }
         if (event.target == solvedModal) {
             solvedModal.style.display = 'none';
-            if (!isLoading) difficultyModal.style.display = 'block'; // Only show if not loading
         }
     });
 
