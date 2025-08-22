@@ -396,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBoard();
         saveState(); // Save state after restart
         setStatusMessage('Game restarted.', 'info');
+        startTimer();
     }
 
     function togglePencilMode() {
