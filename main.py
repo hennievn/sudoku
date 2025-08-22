@@ -28,18 +28,18 @@ async def add_cache_control(request: Request, call_next):
     return response
 
 templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/sudoku/static", StaticFiles(directory="static"), name="static")
 
 class HintRequest(BaseModel):
     board: List[List[int]]
     manual_removals: List[List[List[int]]]
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/sudoku", response_class=HTMLResponse)
 async def read_root(request: Request) -> HTMLResponse:
     """Serves the main HTML page for the Sudoku game."""
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/api/new-game")
+@app.get("/sudoku/api/new-game")
 async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[List[int]]]:
     """Generates a new Sudoku puzzle based on the specified difficulty.
 
@@ -62,7 +62,7 @@ async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[L
         "solution": game.solution.tolist() # For checking on the client side
     }
 
-@app.post("/api/get-hints")
+@app.post("/sudoku/api/get-hints")
 async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]]]:
     """Provides possible candidates for empty cells on the Sudoku board.
 
@@ -102,7 +102,7 @@ async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]
         raise HTTPException(status_code=500, detail=f"Failed to get hints: {e}")
 
 
-@app.post("/api/check-solution")
+@app.post("/sudoku/api/check-solution")
 async def check_solution(current_board: List[List[int]]) -> Dict[str, bool]:
     """Checks if the current Sudoku board is correctly solved.
 

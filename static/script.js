@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const BASE_URL = '/sudoku';
     // Elements
     const boardElement = document.getElementById('sudoku-board');
     const newGameBtn = document.getElementById('new-game');
@@ -352,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.time('newGame_total');
         try {
             console.time('newGame_fetch');
-            const response = await fetch(`/api/new-game?difficulty=${difficulty}`);
+            const response = await fetch(`${BASE_URL}/api/new-game?difficulty=${difficulty}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -426,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true); // Set loading state
         const removalsAsArrays = manualRemovals.map(row => row.map(s => Array.from(s)));
         try {
-            const response = await fetch('/api/get-hints', {
+            const response = await fetch(`${BASE_URL}/api/get-hints`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
