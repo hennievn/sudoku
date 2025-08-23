@@ -250,20 +250,20 @@ h1 {
 }
 
 .palette-number, button.palette-icon {
-    min-width: 60px;
-    height: 40px;
+    min-width: 72px;
+    height: 48px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 1.5em;
+    font-size: 1.8em;
     border: 1px solid var(--palette-btn-border-color);
     background-color: var(--palette-btn-bg-color);
 }
 
 button.palette-icon {
     font-family: 'Material Symbols Outlined';
-    font-size: 2em;
+    font-size: 2.4em;
     color: var(--text-color);
 }
 
