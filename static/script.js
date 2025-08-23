@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const BASE_URL = '/sudoku';
+    const BASE_URL = '';
     // Elements
     const boardElement = document.getElementById('sudoku-board');
     const newGameBtn = document.getElementById('new-game');

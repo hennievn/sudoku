@@ -28,7 +28,7 @@ async def add_cache_control(request: Request, call_next):
     return response
 
 templates = Jinja2Templates(directory="templates")
-app.mount("/sudoku/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class HintRequest(BaseModel):
     board: List[List[int]]
@@ -103,6 +103,7 @@ async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]
 
 
 @app.post("/sudoku/api/check-solution")
+
 async def check_solution(current_board: List[List[int]]) -> Dict[str, bool]:
     """Checks if the current Sudoku board is correctly solved.
 
