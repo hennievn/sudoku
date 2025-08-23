@@ -144,12 +144,10 @@ h1 {
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    grid-template-rows: repeat(9, 1fr);
     border: 3px solid var(--board-border-color);
     margin-top: 4px;
     width: 90vw;
     max-width: 500px;
-    aspect-ratio: 1 / 1;
 }
 
 #controls-sidebar {
@@ -184,6 +182,7 @@ h1 {
     background-color: var(--cell-bg-color);
     position: relative;
     box-sizing: border-box;
+    aspect-ratio: 1 / 1;
 }
 
 .cell.original {
@@ -333,7 +332,6 @@ button.palette-icon.active-icon {
         width: auto;
         height: 80vh; /* Adjust board size for landscape */
         max-height: 600px;
-        aspect-ratio: 1 / 1;
         margin-top: 0;
         margin-right: 20px;
     }
