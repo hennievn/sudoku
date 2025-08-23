@@ -329,10 +329,7 @@ button.palette-icon.active-icon {
     }
 
     #sudoku-board {
-        width: auto;
-        height: 80vh; /* Adjust board size for landscape */
-        max-height: 600px;
-        max-width: 80vh; /* Add this */
+        max-width: 80vh; /* Adjust board size for landscape */
         margin-top: 0;
         margin-right: 20px;
     }
