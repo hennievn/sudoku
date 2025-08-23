@@ -1,0 +1,65 @@
+<div class="modal-content">
+    <span class="close-button" role="button" aria-label="Close help dialog">&times;</span>
+    <h2 id="help-modal-title">Help & Strategy</h2>
+    <h3>Keyboard Shortcuts:</h3>
+    <div class="keyboard-shortcuts-grid">
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">N</span> <span
+                    class="material-symbols-outlined">add_box</span></span> <span class="shortcut-desc">New
+                Game</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">R</span> <span
+                    class="material-symbols-outlined">restart_alt</span></span> <span
+                class="shortcut-desc">Restart Game</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">P</span> <span
+                    class="material-symbols-outlined">draw</span></span> <span class="shortcut-desc">Toggle
+                Pencil Mode</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">H</span> <span
+                    class="material-symbols-outlined">transition_dissolve</span></span> <span
+                class="shortcut-desc">Get a Hint</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">C</span> <span
+                    class="material-symbols-outlined">check_circle</span></span> <span
+                class="shortcut-desc">Check Solution</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">I</span> <span
+                    class="material-symbols-outlined">help</span></span> <span class="shortcut-desc">Show Help
+                Screen</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">1-9</span> <span
+                    class="material-symbols-outlined">pin</span></span> <span class="shortcut-desc">Enter
+                Number</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">Backspace</span>
+                <span class="material-symbols-outlined">backspace</span></span> <span
+                class="shortcut-desc">Delete Number</span></div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">Z</span> <span
+                    class="material-symbols-outlined">undo</span></span> <span class="shortcut-desc">Undo</span>
+        </div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span class="shortcut-key">Y</span> <span
+                    class="material-symbols-outlined">redo</span></span> <span class="shortcut-desc">Redo</span>
+        </div>
+        <div class="shortcut-item"><span class="shortcut-key-icon"><span
+                    class="material-symbols-outlined">ink_pen</span></span> <span class="shortcut-desc">Enter
+                numbers</span></div>
+    </div>
+
+    <h3>Sudoku Strategy:</h3>
+    <div class="sudoku-strategy">
+        <p>Sudoku is a logic-based, combinatorial number-placement puzzle. The objective is to fill a 9×9 grid
+            with digits so that each column, each row, and each of the nine 3×3 subgrids that compose the grid
+            (also called "boxes", "blocks", or "regions") contains all of the digits from 1 to 9.</p>
+        <h4>Basic Techniques:</h4>
+        <ul>
+            <li><b>Scanning:</b> Look for numbers that are already present in a row, column, or 3x3 block. This
+                helps eliminate possibilities for other cells.</li>
+            <li><b>Cross-hatching:</b> Use scanning across multiple rows/columns to find the only possible
+                position for a number in a block.</li>
+            <li><b>Counting:</b> Count which numbers are missing from a row, column, or block.</li>
+        </ul>
+        <h4>Intermediate Techniques:</h4>
+        <ul>
+            <li><b>Hidden Singles:</b> A number is a hidden single in a row, column, or block if it can only go
+                in one cell within that row, column, or block, even if that cell has other candidates.</li>
+            <li><b>Naked Pairs/Triples:</b> If two (or three) cells in a row, column, or block contain the same
+                two (or three) candidates, then those candidates can be eliminated from other cells in that row,
+                column, or block.</li>
+        </ul>
+        <p>Practice is key! The more you play, the better you'll become at spotting patterns and applying
+            strategies.</p>
+    </div>
+</div>
