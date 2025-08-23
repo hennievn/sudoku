@@ -37,7 +37,7 @@
     --cell-bg-color: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
     --cell-border-color: rgb(80, 90, 90); /* Darker for inner grid lines */
     --original-num-color: rgb(173, 188, 188); /* Selenized Dark original */
-    --original-cell-bg-color: #2F2F2F; /* Black for pre-filled numbers in dark mode */
+    --original-cell-bg-color: #1F1F1F; /* Black for pre-filled numbers in dark mode */
     --user-num-color: rgb(86, 182, 194); /* Selenized Dark user */
     --selected-cell-bg-color: rgb(60, 120, 130); /* Muted blue-green */
     --highlighted-cell-bg-color: rgb(60, 120, 130); /* Muted color for highlighted cell */
