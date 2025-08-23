@@ -323,7 +323,7 @@ button.palette-icon.active-icon {
 
     #game-area {
         flex-direction: row; /* Board next to controls */
-        align-items: flex-end; /* Align items to the bottom */
+        align-items: center; /* Align items to the center */
         width: auto;
         height: 100%;
     }
@@ -332,6 +332,7 @@ button.palette-icon.active-icon {
         width: auto;
         height: 80vh; /* Adjust board size for landscape */
         max-height: 600px;
+        max-width: 80vh; /* Add this */
         margin-top: 0;
         margin-right: 20px;
     }
