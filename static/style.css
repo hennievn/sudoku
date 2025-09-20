@@ -107,6 +107,7 @@ h1 {
     align-items: center;
     justify-content: center;
     width: 100%;
+    transform: translateX(-27px);
 }
 
 #timer {
