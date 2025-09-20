@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const backspaceIcon = document.getElementById('backspace-icon');
     const themeToggle = document.getElementById('theme-toggle');
     const loadingIndicator = document.getElementById('loading-indicator'); // New: Get loading indicator
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const settingsModalCloseBtn = settingsModal.querySelector('.close-button');
+    const errorCheckModeToggle = document.getElementById('error-check-mode-toggle');
+    const autoUpdatePencilToggle = document.getElementById('auto-update-pencil-toggle');
 
     // Game state
     const GRID_SIZE = 9; // New constant
@@ -32,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let manualRemovals = [];
     let selectedCell = null;
     let pencilMode = false;
+    let errorCheckMode = true;
+    let autoUpdatePencilEntries = true;
     let timerInterval;
     let startTime;
     let errorCells = [];
@@ -549,8 +556,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Check for conflicts after input
-        if (board[r][c] !== 0) {
+        if (board[r][c] !== 0 && errorCheckMode) {
             checkConflicts(r, c, board[r][c]);
+        }
+
+        if (autoUpdatePencilEntries) {
+            updatePencilMarks(r, c, board[r][c]);
         }
 
         checkErrors(); // Still check against solution for 'error' class
@@ -561,6 +572,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Automatic solution check if board is complete
         if (isBoardComplete()) {
             checkSolution();
+        }
+    }
+
+    function updatePencilMarks(row, col, value) {
+        // Remove the entered number from pencil marks in the same row, column, and block
+        for (let i = 0; i < GRID_SIZE; i++) {
+            pencilMarks[row][i].delete(value);
+            pencilMarks[i][col].delete(value);
+        }
+        const startRow = Math.floor(row / 3) * 3;
+        const startCol = Math.floor(col / 3) * 3;
+        for (let r = startRow; r < startRow + 3; r++) {
+            for (let c = startCol; c < startCol + 3; c++) {
+                pencilMarks[r][c].delete(value);
+            }
         }
     }
 
@@ -697,6 +723,22 @@ document.addEventListener('DOMContentLoaded', () => {
     newGameSolvedBtn.addEventListener('click', () => {
         solvedModal.style.display = 'none';
         if (!isLoading) difficultyModal.style.display = 'block'; // Only show if not loading
+    });
+
+    settingsBtn.addEventListener('click', () => {
+        settingsModal.style.display = 'block';
+    });
+
+    settingsModalCloseBtn.addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+    });
+
+    errorCheckModeToggle.addEventListener('change', () => {
+        errorCheckMode = errorCheckModeToggle.checked;
+    });
+
+    autoUpdatePencilToggle.addEventListener('change', () => {
+        autoUpdatePencilEntries = autoUpdatePencilToggle.checked;
     });
 
     const undoButton = document.getElementById('undo-button');

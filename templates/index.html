@@ -18,6 +18,7 @@
             <h1>Sudoku</h1>
             <div id="game-controls">
                 <button id="new-game" aria-label="Start a new game">New Game</button>
+                <button id="settings-btn" class="material-symbols-outlined" aria-label="Open settings">settings</button>
             </div>
             <div id="timer" aria-live="polite" aria-atomic="true">00:00</div>
         </header>
@@ -158,6 +159,28 @@
             <button id="easy-difficulty-btn" aria-label="Select easy difficulty">Easy</button>
             <button id="medium-difficulty-btn" aria-label="Select medium difficulty">Medium</button>
             <button id="hard-difficulty-btn" aria-label="Select hard difficulty">Hard</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal" style="display:none;" role="dialog" aria-modal="true"
+        aria-labelledby="settings-modal-title">
+        <div class="modal-content">
+            <span class="close-button" role="button" aria-label="Close settings dialog">&times;</span>
+            <h2 id="settings-modal-title">Settings</h2>
+            <div class="setting-item">
+                <label for="error-check-mode-toggle">Error Check Mode</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="error-check-mode-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label for="auto-update-pencil-toggle">Auto-update Pencil Entries</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-update-pencil-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
     </div>
 

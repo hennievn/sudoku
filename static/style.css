@@ -28,6 +28,7 @@
     --new-game-btn-hover-bg: #0056b3; /* Darker blue for new game button hover */
     --difficulty-btn-bg: #007bff; /* Blue for difficulty button */
     --difficulty-btn-hover-bg: #0056b3; /* Darker blue for difficulty button hover */
+    --settings-btn-bg: #6c757d; /* Gray for settings button */
 }
 
 .dark-mode {
@@ -60,6 +61,7 @@
     --new-game-btn-hover-bg: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
     --difficulty-btn-bg: rgb(24, 73, 86); /* Selenized Dark button */
     --difficulty-btn-hover-bg: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
+    --settings-btn-bg: #5a6268; /* Darker gray for settings button in dark mode */
 }
 
 .dark-mode button.palette-icon {
@@ -81,6 +83,7 @@ body {
     position: relative;
     padding: 10px;
     min-height: 100vh; /* Ensure body takes full viewport height */
+    overflow: hidden; /* Prevent scrolling */
 }
 
 #theme-toggle {
@@ -376,6 +379,18 @@ button.palette-icon.active-icon {
     background-color: var(--new-game-btn-hover-bg);
 }
 
+#settings-btn {
+    margin-left: 10px;
+    padding: 10px;
+    font-size: 1.5em;
+    background-color: var(--settings-btn-bg);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    line-height: 1;
+}
+
 .modal {
     position: fixed;
     z-index: 1;
@@ -397,6 +412,58 @@ button.palette-icon.active-icon {
     text-align: center;
     max-height: 80vh;
     overflow-y: auto;
+}
+
+#settings-modal .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 25px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 21px;
+    width: 21px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--user-num-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(25px);
 }
 
 #solved-modal .modal-content h2 {
