@@ -107,7 +107,8 @@ h1 {
     align-items: center;
     justify-content: center;
     width: 100%;
-    transform: translateX(-27px);
+    padding-right: 54px;
+    box-sizing: border-box;
 }
 
 #timer {
@@ -324,6 +325,11 @@ button.palette-icon.active-icon {
         width: auto;
         height: 100%;
         justify-content: space-between;
+    }
+
+    #game-controls {
+        padding-right: 0;
+        justify-content: flex-start;
     }
 
     h1 {
