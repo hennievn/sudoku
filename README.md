@@ -9,3 +9,6 @@ Personaly I run this on a Raspberry Pi 5, running the stock Raspberry Pi OS.
 Feel free to use and modify.  This was 100% created by Google Gemini.  I've not edited a single line of code, only massaged the setup for Caddy and the RPI5 systemd .service file as needed
 
 This is using sudokutools from https://github.com/messersm/sudokutools
+
+You can test drive the game here:  https://sudoku.vanniekerks.net
+
