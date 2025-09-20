@@ -105,10 +105,11 @@ h1 {
     margin-top: 2px;
     display: flex;
     align-items: center;
-    justify-content: center;
     width: 100%;
-    padding-right: 54px;
-    box-sizing: border-box;
+}
+
+#new-game {
+    margin: 0 auto;
 }
 
 #timer {
@@ -327,9 +328,8 @@ button.palette-icon.active-icon {
         justify-content: space-between;
     }
 
-    #game-controls {
-        padding-right: 0;
-        justify-content: flex-start;
+    #new-game {
+        margin: 0;
     }
 
     h1 {
