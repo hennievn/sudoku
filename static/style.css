@@ -103,6 +103,8 @@ h1 {
 
 #game-controls {
     margin-top: 2px;
+    display: flex;
+    align-items: center;
 }
 
 #timer {
