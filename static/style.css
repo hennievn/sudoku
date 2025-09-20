@@ -163,7 +163,7 @@ h1 {
 
 #number-palette {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) auto; /* 4 columns for matrix, auto for new column */
+    grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(4, auto);
     grid-template-areas:
         "num1 num2 num3 pencil help"
@@ -171,9 +171,9 @@ h1 {
         "num7 num8 num9 backspace ."
         "hint undo redo check restart";
     row-gap: 10px;
-    column-gap: 15px;
+    column-gap: 10px;
     margin-top: 10px;
-    max-width: 500px;
+    width: 100%;
 }
 
 /* Common styles for cells */
@@ -253,8 +253,8 @@ h1 {
 }
 
 .palette-number, button.palette-icon {
-    min-width: 79px;
-    height: 53px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
     align-items: center;
