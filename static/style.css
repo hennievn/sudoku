@@ -103,11 +103,18 @@ h1 {
 
 #game-controls {
     margin-top: 2px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     transform: translateX(-27px);
+}
+
+#new-game {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #new-game {
@@ -331,9 +338,12 @@ button.palette-icon.active-icon {
     }
 
     #game-controls {
-        transform: none;
-        justify-content: flex-start;
-        width: auto; /* also reset width */
+        position: static; /* reset position */
+    }
+
+    #new-game {
+        position: static; /* reset position */
+        transform: none; /* reset transform */
     }
 
     h1 {
@@ -620,4 +630,5 @@ input:checked + .slider:before {
 }
 }transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}0deg); }
 }
