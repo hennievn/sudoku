@@ -254,7 +254,7 @@ h1 {
 
 .palette-number, button.palette-icon {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1.5 / 1;
     display: flex;
     justify-content: center;
     align-items: center;
