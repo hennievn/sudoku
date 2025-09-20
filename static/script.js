@@ -212,18 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let c = 0; c < GRID_SIZE; c++) {
                 let cellElement = boardElement.querySelector(`[data-row='${r}'][data-col='${c}']`);
 
-                // If cell doesn't exist, create it (first draw)
-                if (!cellElement) {
-                    console.time('drawBoard_create_cell');
-                    cellElement = document.createElement('div');
-                    cellElement.classList.add('cell');
-                    cellElement.dataset.row = r;
-                    cellElement.dataset.col = c;
-                    cellElement.addEventListener('click', () => selectCell(cellElement, r, c));
-                    boardElement.appendChild(cellElement);
-                    console.timeEnd('drawBoard_create_cell');
-                }
-
                 const currentVal = board[r][c];
                 const originalVal = originalBoard[r][c];
                 const currentPencilMarks = pencilMarks[r][c];
@@ -647,6 +635,12 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.textContent = 'light_mode';
     }
     themeToggle.addEventListener('click', toggleTheme);
+
+    boardElement.querySelectorAll('.cell').forEach(cell => {
+        const r = parseInt(cell.dataset.row);
+        const c = parseInt(cell.dataset.col);
+        cell.addEventListener('click', () => selectCell(cell, r, c));
+    });
 
     document.addEventListener('keydown', (e) => {
         if (isLoading) return; // Prevent input when loading

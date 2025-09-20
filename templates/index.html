@@ -26,7 +26,13 @@
             <div id="loading-indicator" style="display: none;">
                 <div class="spinner"></div>
             </div>
-            <div id="sudoku-board" role="grid" aria-label="Sudoku Board"></div>
+            <div id="sudoku-board" role="grid" aria-label="Sudoku Board">
+                {% for r in range(9) %}
+                    {% for c in range(9) %}
+                        <div class="cell" data-row="{{ r }}" data-col="{{ c }}"></div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
             <aside id="controls-sidebar"> <!-- Changed to aside -->
                 <div id="number-palette" role="group" aria-label="Number and Action Palette">
                     <button class="palette-icon material-symbols-outlined palette-button" id="undo-button"
