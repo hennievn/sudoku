@@ -105,7 +105,9 @@ h1 {
     margin-top: 2px;
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
+    transform: translateX(-27px);
 }
 
 #new-game {
@@ -328,8 +330,10 @@ button.palette-icon.active-icon {
         justify-content: space-between;
     }
 
-    #new-game {
-        margin: 0;
+    #game-controls {
+        transform: none;
+        justify-content: flex-start;
+        width: auto; /* also reset width */
     }
 
     h1 {
