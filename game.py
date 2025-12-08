@@ -58,10 +58,37 @@ class SudokuGame:
             min_clues = difficulty_mapping.get(self.difficulty, 30)
             
             # Generate the puzzle and its solution
-            puzzle = generate.generate(min_count=min_clues)
-            solution = list(bruteforce(puzzle))[0]
+            # Retry loop to ensure difficulty consistency
+            max_retries = 20
+            for attempt in range(max_retries):
+                puzzle = generate.generate(min_count=min_clues)
+                solution = list(bruteforce(puzzle))[0]
+                
+                np_puzzle = self._convert_sudoku_to_numpy(puzzle)
+                
+                # Difficulty Check
+                if self.difficulty == "hard":
+                    # Hard puzzles should NOT be solvable by basic methods alone
+                    is_basic, _ = self._solve_basic(np_puzzle)
+                    if is_basic:
+                        logging.info(f"Generated puzzle was too easy for 'hard' (Attempt {attempt+1}/{max_retries}). Retrying...")
+                        continue
+                    else:
+                         logging.info(f"Generated puzzle passed 'hard' difficulty check (Attempt {attempt+1}/{max_retries}).")
+                         return np_puzzle, self._convert_sudoku_to_numpy(solution)
+                
+                elif self.difficulty == "medium":
+                    # Medium could have some mixed criteria, but for now we accept standard generation
+                     return np_puzzle, self._convert_sudoku_to_numpy(solution)
 
-            logging.info("Puzzle generated successfully with sudokutools.")
+                else: # Easy
+                    # Easy puzzles SHOULD be solvable by basic methods (mostly)
+                    # For now, we accept sudokutools' "easy" (35 clues) as is, 
+                    # but logic can be added here if needed.
+                    return np_puzzle, self._convert_sudoku_to_numpy(solution)
+            
+            # If retries exhausted, return the last generated one
+            logging.warning("Max retries reached for difficulty generation. Returning last generated puzzle.")
             return self._convert_sudoku_to_numpy(puzzle), self._convert_sudoku_to_numpy(solution)
         except Exception as e:
             logging.error(f"Error generating puzzle with sudokutools: {e}", exc_info=True)
@@ -227,3 +254,91 @@ class SudokuGame:
             for c in range(self.GRID_SIZE):
                 np_array[r, c] = sudoku_obj[r, c]
         return np_array
+
+    def _solve_basic(self, board: np.ndarray) -> Tuple[bool, int]:
+        """
+        Tries to solve the board using ONLY Naked Singles and Hidden Singles.
+        Returns (is_solved, steps_taken)
+        """
+        board = board.copy()
+        changed = True
+        steps = 0
+        
+        while changed:
+            changed = False
+            
+            # 1. Naked Singles
+            for r in range(self.GRID_SIZE):
+                for c in range(self.GRID_SIZE):
+                    if board[r, c] == 0:
+                        cands = self._get_candidates(board, r, c)
+                        if len(cands) == 1:
+                            val = cands.pop()
+                            board[r, c] = val
+                            changed = True
+                            steps += 1
+            
+            if changed: continue
+            
+            # 2. Hidden Singles
+            for num in range(1, 10):
+                # Rows
+                for r in range(self.GRID_SIZE):
+                    possible_cols = []
+                    for c in range(self.GRID_SIZE):
+                        if board[r, c] == 0 and num in self._get_candidates(board, r, c):
+                            possible_cols.append(c)
+                    if len(possible_cols) == 1:
+                        c = possible_cols[0]
+                        board[r, c] = num
+                        changed = True
+                        steps += 1
+                
+                if changed: break 
+
+                # Cols
+                for c in range(self.GRID_SIZE):
+                    possible_rows = []
+                    for r in range(self.GRID_SIZE):
+                        if board[r, c] == 0 and num in self._get_candidates(board, r, c):
+                            possible_rows.append(r)
+                    if len(possible_rows) == 1:
+                        r = possible_rows[0]
+                        board[r, c] = num
+                        changed = True
+                        steps += 1
+                
+                if changed: break
+
+                # Boxes
+                for br in range(0, self.GRID_SIZE, 3):
+                    for bc in range(0, self.GRID_SIZE, 3):
+                        possible_cells = []
+                        for r in range(br, br+3):
+                            for c in range(bc, bc+3):
+                                if board[r, c] == 0 and num in self._get_candidates(board, r, c):
+                                    possible_cells.append((r, c))
+                        if len(possible_cells) == 1:
+                            r, c = possible_cells[0]
+                            board[r, c] = num
+                            changed = True
+                            steps += 1
+                
+                if changed: break
+                
+        return np.count_nonzero(board) == 81, steps
+
+    def _get_candidates(self, board: np.ndarray, r: int, c: int) -> Set[int]:
+        if board[r, c] != 0:
+            return set()
+        
+        candidates = set(range(1, 10))
+        # Row
+        candidates -= set(board[r, :])
+        # Col
+        candidates -= set(board[:, c])
+        # Box
+        br, bc = (r // 3) * 3, (c // 3) * 3
+        candidates -= set(board[br:br+3, bc:bc+3].flatten())
+        
+        return candidates

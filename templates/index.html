@@ -18,6 +18,8 @@
             <h1>Sudoku</h1>
             <div id="game-controls">
                 <button id="new-game" aria-label="Start a new game">New Game</button>
+                <button id="save-game-btn" class="material-symbols-outlined"
+                    aria-label="Open in SudokuWiki">open_in_new</button>
                 <button id="settings-btn" class="material-symbols-outlined" aria-label="Open settings">settings</button>
             </div>
             <div id="timer" aria-live="polite" aria-atomic="true">00:00</div>
@@ -28,9 +30,9 @@
             </div>
             <div id="sudoku-board" role="grid" aria-label="Sudoku Board">
                 {% for r in range(9) %}
-                    {% for c in range(9) %}
-                        <div class="cell" data-row="{{ r }}" data-col="{{ c }}"></div>
-                    {% endfor %}
+                {% for c in range(9) %}
+                <div class="cell" data-row="{{ r }}" data-col="{{ c }}"></div>
+                {% endfor %}
                 {% endfor %}
             </div>
             <aside id="controls-sidebar"> <!-- Changed to aside -->

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const boardElement = document.getElementById('sudoku-board');
     const newGameBtn = document.getElementById('new-game');
+    const saveGameBtn = document.getElementById('save-game-btn');
     const numberPalette = document.getElementById('number-palette');
     const checkSolutionBtn = document.getElementById('check-button');
     const statusElement = document.getElementById('status');
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let startTime;
     let errorCells = [];
     let conflictCells = []; // New: for real-time conflicts
+    let currentDifficulty = 'hard'; // Default difficulty
 
     let history = [];
     let historyPointer = -1;
@@ -192,6 +194,52 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUndoRedoButtons();
     }
 
+    function generateSudokuString() {
+        let s = 'S9B'; // S = Sudoku, 9 = size, B = version 2
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                let n;
+                if (originalBoard[r][c] !== 0) {
+                    // Clue: 1-9
+                    n = originalBoard[r][c];
+                } else if (board[r][c] !== 0) {
+                    // Solved cell (user entered): 10-18
+                    n = board[r][c] + 9;
+                } else {
+                    // Candidates
+                    let mask = 0;
+                    const marks = pencilMarks[r][c];
+                    if (marks.size === 0) {
+                        // If no marks and empty, assume all candidates (511)
+                        mask = 511;
+                    } else {
+                        for (let k = 1; k <= 9; k++) {
+                            if (marks.has(k)) {
+                                mask |= (1 << (k - 1));
+                            }
+                        }
+                    }
+                    // Candidates: 19+ (18 is offset for 0 candidates, but logic says candidates > 0)
+                    // The spec says: candidates + 18.
+                    // If mask is 1 (candidate 1), n = 19.
+                    // If mask is 511 (all), n = 529.
+                    n = mask + 18;
+                }
+
+                let h = n.toString(36);
+                if (h.length < 2) h = '0' + h;
+                s += h;
+            }
+        }
+        return s;
+    }
+
+    function openInSudokuWiki() {
+        const sudokuString = generateSudokuString();
+        const exportUrl = `https://www.sudokuwiki.org/sudoku.htm?bd=${sudokuString}`;
+        window.open(exportUrl, '_blank');
+    }
+
     function drawBoard() {
         console.time('drawBoard_total');
         const boardState = {
@@ -338,6 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function newGame(difficulty) {
+        currentDifficulty = difficulty;
         difficultyModal.style.display = 'none';
         setLoading(true); // Set loading state
         setStatusMessage(`Generating ${difficulty} puzzle...`, 'info');
@@ -689,6 +738,11 @@ document.addEventListener('DOMContentLoaded', () => {
     newGameBtn.addEventListener('click', () => {
         if (isLoading) return; // Prevent multiple clicks
         difficultyModal.style.display = 'block';
+    });
+
+    saveGameBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openInSudokuWiki();
     });
 
     easyDifficultyBtn.addEventListener('click', () => { if (!isLoading) newGame('easy'); });

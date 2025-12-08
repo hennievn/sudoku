@@ -1,67 +1,127 @@
 :root {
-    --bg-color: #f0f0f0; /* Light gray background */
-    --text-color: #333; /* Dark text */
-    --board-border-color: #333; /* Dark border */
-    --cell-bg-color: #ffffff; /* White cell background */
-    --cell-border-color: #ccc; /* Light gray cell border */
-    --original-num-color: #333; /* Dark original numbers */
-    --original-cell-bg-color: #eee; /* Lighter gray for original cells */
-    --user-num-color: #007bff; /* Blue for user numbers */
-    --selected-cell-bg-color: #a2d2ff; /* Light blue for selected */
-    --active-btn-bg-color: #e0f2f7; /* Light blue for active button */
-    --highlighted-cell-bg-color: #e0f2f7; /* Light blue for highlighted */
-    --error-cell-bg-color: #e0e0e0; /* Light gray for errors */
-    --pencil-mark-color: #666; /* Gray for pencil marks */
-    --palette-btn-bg-color: #ffffff; /* White for palette buttons */
-    --palette-btn-border-color: #ccc; /* Light gray for palette button border */
-    --status-info-color: #333; /* Dark for info status */
-    --status-info-bg-color: #e0e0e0; /* Light gray for info status background */
-    --status-success-color: #0056b3; /* Vibrant blue for success status */
-    --status-success-bg-color: #e0f2f7; /* Light blue for success status background */
-    --status-error-color: #cc5500; /* Dark orange for error status */
-    --status-error-bg-color: #e0e0e0; /* Light gray for error status background */
-    --modal-bg-color: #fefefe; /* White for modal background */
-    --modal-border-color: #888; /* Gray for modal border */
-    --modal-overlay-color: rgba(0,0,0,0.4); /* Dark overlay */
-    --close-button-color: #aaa; /* Light gray for close button */
-    --new-game-btn-bg: #007bff; /* Blue for new game button */
-    --new-game-btn-hover-bg: #0056b3; /* Darker blue for new game button hover */
-    --difficulty-btn-bg: #007bff; /* Blue for difficulty button */
-    --difficulty-btn-hover-bg: #0056b3; /* Darker blue for difficulty button hover */
-    --settings-btn-bg: #6c757d; /* Gray for settings button */
+    --bg-color: #f0f0f0;
+    /* Light gray background */
+    --text-color: #333;
+    /* Dark text */
+    --board-border-color: #333;
+    /* Dark border */
+    --cell-bg-color: #ffffff;
+    /* White cell background */
+    --cell-border-color: #ccc;
+    /* Light gray cell border */
+    --original-num-color: #333;
+    /* Dark original numbers */
+    --original-cell-bg-color: #eee;
+    /* Lighter gray for original cells */
+    --user-num-color: #007bff;
+    /* Blue for user numbers */
+    --selected-cell-bg-color: #a2d2ff;
+    /* Light blue for selected */
+    --active-btn-bg-color: #e0f2f7;
+    /* Light blue for active button */
+    --highlighted-cell-bg-color: #e0f2f7;
+    /* Light blue for highlighted */
+    --error-cell-bg-color: #e0e0e0;
+    /* Light gray for errors */
+    --pencil-mark-color: #666;
+    /* Gray for pencil marks */
+    --palette-btn-bg-color: #ffffff;
+    /* White for palette buttons */
+    --palette-btn-border-color: #ccc;
+    /* Light gray for palette button border */
+    --status-info-color: #333;
+    /* Dark for info status */
+    --status-info-bg-color: #e0e0e0;
+    /* Light gray for info status background */
+    --status-success-color: #0056b3;
+    /* Vibrant blue for success status */
+    --status-success-bg-color: #e0f2f7;
+    /* Light blue for success status background */
+    --status-error-color: #cc5500;
+    /* Dark orange for error status */
+    --status-error-bg-color: #e0e0e0;
+    /* Light gray for error status background */
+    --modal-bg-color: #fefefe;
+    /* White for modal background */
+    --modal-border-color: #888;
+    /* Gray for modal border */
+    --modal-overlay-color: rgba(0, 0, 0, 0.4);
+    /* Dark overlay */
+    --close-button-color: #aaa;
+    /* Light gray for close button */
+    --new-game-btn-bg: #007bff;
+    /* Blue for new game button */
+    --new-game-btn-hover-bg: #0056b3;
+    /* Darker blue for new game button hover */
+    --difficulty-btn-bg: #007bff;
+    /* Blue for difficulty button */
+    --difficulty-btn-hover-bg: #0056b3;
+    /* Darker blue for difficulty button hover */
+    --settings-btn-bg: #6c757d;
+    /* Gray for settings button */
 }
 
 .dark-mode {
-    --bg-color: rgb(16, 60, 72); /* Selenized Dark bg */
-    --text-color: rgb(173, 188, 188); /* Selenized Dark original/button_text */
-    --board-border-color: rgb(112, 128, 128); /* Selenized Dark grid */
-    --cell-bg-color: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
-    --cell-border-color: rgb(80, 90, 90); /* Darker for inner grid lines */
-    --original-num-color: rgb(173, 188, 188); /* Selenized Dark original */
-    --original-cell-bg-color: #1F1F1F; /* Black for pre-filled numbers in dark mode */
-    --user-num-color: rgb(86, 182, 194); /* Selenized Dark user */
-    --selected-cell-bg-color: rgb(60, 120, 130); /* Muted blue-green */
-    --highlighted-cell-bg-color: rgb(60, 120, 130); /* Muted color for highlighted cell */
-    --error-cell-bg-color: rgb(255, 150, 0); /* Vibrant orange for error */
-    --pencil-mark-color: rgb(112, 128, 128); /* Selenized Dark pencil */
-    --palette-btn-bg-color: rgb(24, 73, 86); /* Selenized Dark button */
-    --palette-btn-border-color: rgb(112, 128, 128); /* Selenized Dark grid */
-    --active-btn-bg-color: rgb(60, 120, 130); /* Muted color for active button */
-    --status-info-color: rgb(173, 188, 188); /* Selenized Dark original */
-    --status-info-bg-color: rgb(24, 73, 86); /* Selenized Dark button */
-    --status-success-color: rgb(100, 150, 255); /* Light blue for success */
-    --status-success-bg-color: rgb(24, 73, 86); /* Selenized Dark button */
-    --status-error-color: rgb(200, 100, 0); /* Dark orange for error */
-    --status-error-bg-color: rgb(24, 73, 86); /* Selenized Dark button */
-    --modal-bg-color: rgb(24, 73, 86); /* Selenized Dark dialog_bg */
-    --modal-border-color: rgb(173, 188, 188); /* Selenized Dark dialog_border */
-    --modal-overlay-color: rgba(0,0,0,0.7); /* Darker overlay */
-    --close-button-color: rgb(173, 188, 188); /* Selenized Dark original */
-    --new-game-btn-bg: rgb(24, 73, 86); /* Selenized Dark button */
-    --new-game-btn-hover-bg: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
-    --difficulty-btn-bg: rgb(24, 73, 86); /* Selenized Dark button */
-    --difficulty-btn-hover-bg: rgb(10, 50, 60); /* Selenized Dark sidebar_bg */
-    --settings-btn-bg: #5a6268; /* Darker gray for settings button in dark mode */
+    --bg-color: rgb(16, 60, 72);
+    /* Selenized Dark bg */
+    --text-color: rgb(173, 188, 188);
+    /* Selenized Dark original/button_text */
+    --board-border-color: rgb(112, 128, 128);
+    /* Selenized Dark grid */
+    --cell-bg-color: rgb(10, 50, 60);
+    /* Selenized Dark sidebar_bg */
+    --cell-border-color: rgb(80, 90, 90);
+    /* Darker for inner grid lines */
+    --original-num-color: rgb(173, 188, 188);
+    /* Selenized Dark original */
+    --original-cell-bg-color: #1F1F1F;
+    /* Black for pre-filled numbers in dark mode */
+    --user-num-color: rgb(86, 182, 194);
+    /* Selenized Dark user */
+    --selected-cell-bg-color: rgb(60, 120, 130);
+    /* Muted blue-green */
+    --highlighted-cell-bg-color: rgb(60, 120, 130);
+    /* Muted color for highlighted cell */
+    --error-cell-bg-color: rgb(255, 150, 0);
+    /* Vibrant orange for error */
+    --pencil-mark-color: rgb(112, 128, 128);
+    /* Selenized Dark pencil */
+    --palette-btn-bg-color: rgb(24, 73, 86);
+    /* Selenized Dark button */
+    --palette-btn-border-color: rgb(112, 128, 128);
+    /* Selenized Dark grid */
+    --active-btn-bg-color: rgb(60, 120, 130);
+    /* Muted color for active button */
+    --status-info-color: rgb(173, 188, 188);
+    /* Selenized Dark original */
+    --status-info-bg-color: rgb(24, 73, 86);
+    /* Selenized Dark button */
+    --status-success-color: rgb(100, 150, 255);
+    /* Light blue for success */
+    --status-success-bg-color: rgb(24, 73, 86);
+    /* Selenized Dark button */
+    --status-error-color: rgb(200, 100, 0);
+    /* Dark orange for error */
+    --status-error-bg-color: rgb(24, 73, 86);
+    /* Selenized Dark button */
+    --modal-bg-color: rgb(24, 73, 86);
+    /* Selenized Dark dialog_bg */
+    --modal-border-color: rgb(173, 188, 188);
+    /* Selenized Dark dialog_border */
+    --modal-overlay-color: rgba(0, 0, 0, 0.7);
+    /* Darker overlay */
+    --close-button-color: rgb(173, 188, 188);
+    /* Selenized Dark original */
+    --new-game-btn-bg: rgb(24, 73, 86);
+    /* Selenized Dark button */
+    --new-game-btn-hover-bg: rgb(10, 50, 60);
+    /* Selenized Dark sidebar_bg */
+    --difficulty-btn-bg: rgb(24, 73, 86);
+    /* Selenized Dark button */
+    --difficulty-btn-hover-bg: rgb(10, 50, 60);
+    /* Selenized Dark sidebar_bg */
+    --settings-btn-bg: #5a6268;
+    /* Darker gray for settings button in dark mode */
 }
 
 .dark-mode button.palette-icon {
@@ -69,7 +129,8 @@
 }
 
 .dark-mode .cell.selected .pencil-mark {
-    color: rgb(50, 50, 50); /* Darker color for selected pencil marks in dark mode */
+    color: rgb(50, 50, 50);
+    /* Darker color for selected pencil marks in dark mode */
 }
 
 /* Base styles (Portrait Mode Default) */
@@ -82,8 +143,10 @@ body {
     color: var(--text-color);
     position: relative;
     padding: 10px;
-    min-height: 100vh; /* Ensure body takes full viewport height */
-    overflow: hidden; /* Prevent scrolling */
+    min-height: 100vh;
+    /* Ensure body takes full viewport height */
+    overflow: hidden;
+    /* Prevent scrolling */
 }
 
 #theme-toggle {
@@ -107,7 +170,8 @@ h1 {
     align-items: center;
     justify-content: center;
     width: 100%;
-    position: relative; /* Add this */
+    position: relative;
+    /* Add this */
 }
 
 #new-game {
@@ -148,7 +212,8 @@ h1 {
 
 #game-area {
     display: flex;
-    flex-direction: column; /* Board on top, controls below */
+    flex-direction: column;
+    /* Board on top, controls below */
     align-items: center;
     width: 100%;
     flex-grow: 1;
@@ -215,6 +280,7 @@ h1 {
     .cell.original {
         font-size: clamp(1.8em, 6vw, 2.3em);
     }
+
     .cell.user-entered {
         font-size: clamp(1.8em, 6vw, 2.3em);
     }
@@ -255,16 +321,18 @@ h1 {
 .cell:nth-child(3n) {
     border-right: 2px solid var(--board-border-color);
 }
+
 .cell:nth-child(9n) {
     border-right: none;
 }
 
-#sudoku-board > .cell:nth-child(n+19):nth-child(-n+27),
-#sudoku-board > .cell:nth-child(n+46):nth-child(-n+54) {
+#sudoku-board>.cell:nth-child(n+19):nth-child(-n+27),
+#sudoku-board>.cell:nth-child(n+46):nth-child(-n+54) {
     border-bottom: 2px solid var(--board-border-color);
 }
 
-.palette-number, button.palette-icon {
+.palette-number,
+button.palette-icon {
     width: 100%;
     aspect-ratio: 1.5 / 1;
     display: flex;
@@ -282,12 +350,14 @@ button.palette-icon {
     color: var(--text-color);
 }
 
-.palette-number:disabled, button.palette-icon:disabled {
+.palette-number:disabled,
+button.palette-icon:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.palette-number.selected, .palette-icon.selected {
+.palette-number.selected,
+.palette-icon.selected {
     background-color: var(--selected-cell-bg-color);
 }
 
@@ -338,12 +408,15 @@ button.palette-icon.active-icon {
     }
 
     #game-controls {
-        position: static; /* reset position */
+        position: static;
+        /* reset position */
     }
 
     #new-game {
-        position: static; /* reset position */
-        transform: none; /* reset transform */
+        position: static;
+        /* reset position */
+        transform: none;
+        /* reset transform */
     }
 
     h1 {
@@ -351,14 +424,17 @@ button.palette-icon.active-icon {
     }
 
     #game-area {
-        flex-direction: row; /* Board next to controls */
-        align-items: flex-end; /* Align items to the center */
+        flex-direction: row;
+        /* Board next to controls */
+        align-items: flex-end;
+        /* Align items to the center */
         width: auto;
         height: 100%;
     }
 
     #sudoku-board {
-        max-width: 80vh; /* Adjust board size for landscape */
+        max-width: 80vh;
+        /* Adjust board size for landscape */
         margin-top: 0;
         margin-right: 20px;
     }
@@ -366,12 +442,14 @@ button.palette-icon.active-icon {
     #controls-sidebar {
         width: auto;
         height: 100%;
-        max-width: 300px; /* Limit sidebar width */
+        max-width: 300px;
+        /* Limit sidebar width */
         justify-content: flex-end;
     }
 
     #number-palette {
-        grid-template-columns: repeat(3, 1fr); /* More compact for landscape sidebar */
+        grid-template-columns: repeat(3, 1fr);
+        /* More compact for landscape sidebar */
         grid-template-rows: auto;
         grid-template-areas:
             "num1 num2 num3"
@@ -416,6 +494,19 @@ button.palette-icon.active-icon {
     line-height: 1;
     position: absolute;
     right: 0;
+}
+
+#save-game-btn {
+    padding: 10px;
+    font-size: 1.5em;
+    background-color: var(--settings-btn-bg);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    line-height: 1;
+    position: absolute;
+    right: 55px;
 }
 
 .modal {
@@ -485,11 +576,11 @@ button.palette-icon.active-icon {
     border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: var(--user-num-color);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
     transform: translateX(25px);
 }
 
@@ -605,31 +696,36 @@ input:checked + .slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute; /* Position it over the board */
+    position: absolute;
+    /* Position it over the board */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: transparent; /* No overlay */
-    z-index: 10; /* Ensure it's above the board */
+    background-color: transparent;
+    /* No overlay */
+    z-index: 10;
+    /* Ensure it's above the board */
 }
 
 .spinner {
-    border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #3498db; /* Blue */
+    border: 8px solid #f3f3f3;
+    /* Light grey */
+    border-top: 8px solid #3498db;
+    /* Blue */
     border-radius: 50%;
     width: 60px;
     height: 60px;
+
     animation: spin 2s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-}transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}0deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
