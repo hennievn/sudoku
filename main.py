@@ -11,6 +11,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from game import SudokuGame
+from sudokutools.sudoku import Sudoku
+from sudokutools.solve import init_candidates
+
 
 class Difficulty(str, Enum):
     easy = "easy"
@@ -40,7 +43,7 @@ async def read_root(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/api/new-game")
-async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[List[int]]]:
+def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[List[int]]]:
     """Generates a new Sudoku puzzle based on the specified difficulty.
 
     Args:
@@ -63,7 +66,7 @@ async def new_game(difficulty: Difficulty = Difficulty.hard) -> Dict[str, List[L
     }
 
 @app.post("/api/get-hints")
-async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]]]:
+def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]]]:
     """Provides possible candidates for empty cells on the Sudoku board.
 
     Args:
@@ -74,8 +77,7 @@ async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]
     """
     try:
         logging.info("Getting hints using sudokutools...")
-        from sudokutools.sudoku import Sudoku
-        from sudokutools.solve import init_candidates
+        
         
         # Convert the board to a string format that sudokutools can understand
         board_str = "\n".join(["".join(map(str, row)) for row in hint_request.board])
@@ -104,7 +106,7 @@ async def get_hints(hint_request: HintRequest) -> Dict[str, List[List[List[int]]
 
 @app.post("/api/check-solution")
 
-async def check_solution(current_board: List[List[int]]) -> Dict[str, bool]:
+def check_solution(current_board: List[List[int]]) -> Dict[str, bool]:
     """Checks if the current Sudoku board is correctly solved.
 
     Args:
@@ -115,7 +117,6 @@ async def check_solution(current_board: List[List[int]]) -> Dict[str, bool]:
     """
     try:
         logging.info("Checking solution using sudokutools...")
-        from sudokutools.sudoku import Sudoku
         # Convert the board to a string format that sudokutools can understand
         board_str = "\n".join(["".join(map(str, row)) for row in current_board])
         board = Sudoku.decode(board_str)

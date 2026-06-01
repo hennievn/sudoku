@@ -323,6 +323,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     newClasses.add('user-entered');
                 }
 
+                // Add selected class to newClasses if this is the selected cell
+                if (r === boardState.selectedRow && c === boardState.selectedCol) {
+                    newClasses.add('selected');
+                }
+
+                // Add cross-highlighted class if cell shares row, col, or box with selected cell
+                if (boardState.selectedRow !== -1 && boardState.selectedCol !== -1) {
+                    const isSameRow = (r === boardState.selectedRow);
+                    const isSameCol = (c === boardState.selectedCol);
+                    const isSameBox = (Math.floor(r / 3) === Math.floor(boardState.selectedRow / 3) &&
+                                       Math.floor(c / 3) === Math.floor(boardState.selectedCol / 3));
+                    const isSelf = (r === boardState.selectedRow && c === boardState.selectedCol);
+
+                    if ((isSameRow || isSameCol || isSameBox) && !isSelf) {
+                        newClasses.add('cross-highlighted');
+                    }
+                }
+
                 // Compare current classes with newClasses
                 console.time('drawBoard_class_check');
                 const currentClasses = new Set(cellElement.classList);
@@ -340,20 +358,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.timeEnd('drawBoard_cell_loop');
 
-        // Handle selected cell and highlights
+        // Handle highlights based on selection
         console.time('drawBoard_selection_highlight');
         if (selectedCell) {
-            const reselectedCell = boardElement.querySelector(`[data-row='${boardState.selectedRow}'][data-col='${boardState.selectedCol}']`);
-            if (reselectedCell) {
-                selectedCell.classList.remove('selected'); // Remove from old selected
-                selectedCell = reselectedCell;
-                selectedCell.classList.add('selected');
-                const num = board[boardState.selectedRow][boardState.selectedCol] || originalBoard[boardState.selectedRow][boardState.selectedCol];
-                updateHighlights(num);
-            }
+            const num = board[boardState.selectedRow][boardState.selectedCol] || originalBoard[boardState.selectedRow][boardState.selectedCol];
+            updateHighlights(num);
         } else {
             // If no cell is selected, ensure no cells are highlighted
-            document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected', 'highlighted'));
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlighted'));
         }
         console.timeEnd('drawBoard_selection_highlight');
         console.timeEnd('drawBoard_total');
@@ -375,14 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectCell(cell, r, c) {
-        if (selectedCell) {
-            selectedCell.classList.remove('selected');
-        }
         selectedCell = cell;
-        selectedCell.classList.add('selected');
-
-        const num = board[r][c] || originalBoard[r][c];
-        updateHighlights(num);
+        drawBoard();
     }
 
     async function newGame(difficulty) {
@@ -693,6 +699,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', (e) => {
         if (isLoading) return; // Prevent input when loading
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+            return;
+        }
+
+        // Arrow Key Grid Navigation
+        let r = selectedCell ? parseInt(selectedCell.dataset.row) : 0;
+        let c = selectedCell ? parseInt(selectedCell.dataset.col) : 0;
+        let moved = false;
+
+        switch (e.key) {
+            case 'ArrowUp':
+                r = selectedCell ? Math.max(0, r - 1) : 0;
+                moved = true;
+                break;
+            case 'ArrowDown':
+                r = selectedCell ? Math.min(GRID_SIZE - 1, r + 1) : 0;
+                moved = true;
+                break;
+            case 'ArrowLeft':
+                c = selectedCell ? Math.max(0, c - 1) : 0;
+                moved = true;
+                break;
+            case 'ArrowRight':
+                c = selectedCell ? Math.min(GRID_SIZE - 1, c + 1) : 0;
+                moved = true;
+                break;
+        }
+
+        if (moved) {
+            e.preventDefault(); // Prevent browser scrolling
+            const targetCell = boardElement.querySelector(`[data-row='${r}'][data-col='${c}']`);
+            if (targetCell) {
+                selectCell(targetCell, r, c);
+            }
+            return;
+        }
+
         switch (e.key.toLowerCase()) {
             case 'n': difficultyModal.style.display = 'block'; break;
             case 'r': restartGame(); break;

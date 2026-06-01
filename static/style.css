@@ -59,6 +59,8 @@
     /* Darker blue for difficulty button hover */
     --settings-btn-bg: #6c757d;
     /* Gray for settings button */
+    --cross-highlight-bg-color: rgba(0, 123, 255, 0.04);
+    /* Very light blue-gray for rows/cols/boxes of selected cell */
 }
 
 .dark-mode {
@@ -122,6 +124,8 @@
     /* Selenized Dark sidebar_bg */
     --settings-btn-bg: #5a6268;
     /* Darker gray for settings button in dark mode */
+    --cross-highlight-bg-color: rgba(60, 120, 130, 0.15);
+    /* Translucent deep teal for dark mode cross-highlight */
 }
 
 .dark-mode button.palette-icon {
@@ -135,7 +139,7 @@
 
 /* Base styles (Portrait Mode Default) */
 body {
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -305,6 +309,10 @@ h1 {
     height: 100%;
 }
 
+.cell.cross-highlighted {
+    background-color: var(--cross-highlight-bg-color);
+}
+
 .cell.selected {
     background-color: var(--selected-cell-bg-color);
 }
@@ -342,6 +350,22 @@ button.palette-icon {
     font-size: 2.0em;
     border: 1px solid var(--palette-btn-border-color);
     background-color: var(--palette-btn-bg-color);
+    border-radius: 8px; /* Rounded corners for buttons */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+    transition: all 0.2s ease-in-out; /* Smooth hover transition */
+}
+
+.palette-number:hover,
+button.palette-icon:hover:not(:disabled) {
+    transform: translateY(-1px); /* Slight lift */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* Enhanced shadow */
+    background-color: var(--highlighted-cell-bg-color);
+}
+
+.palette-number:active,
+button.palette-icon:active:not(:disabled) {
+    transform: translateY(1px); /* Press down effect */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 button.palette-icon {
@@ -354,6 +378,8 @@ button.palette-icon {
 button.palette-icon:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 .palette-number.selected,
@@ -476,11 +502,20 @@ button.palette-icon.active-icon {
     background-color: var(--new-game-btn-bg);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px; /* Slightly rounder */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
 }
 
 #new-game:hover {
     background-color: var(--new-game-btn-hover-bg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+#new-game:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 #settings-btn {
@@ -494,6 +529,17 @@ button.palette-icon.active-icon {
     line-height: 1;
     position: absolute;
     right: 0;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#settings-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#settings-btn:active {
+    transform: scale(0.95);
 }
 
 #save-game-btn {
@@ -507,6 +553,17 @@ button.palette-icon.active-icon {
     line-height: 1;
     position: absolute;
     right: 55px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#save-game-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#save-game-btn:active {
+    transform: scale(0.95);
 }
 
 .modal {
