@@ -62,7 +62,7 @@ class SudokuGame:
             max_retries = 20
             for attempt in range(max_retries):
                 puzzle = generate.generate(min_count=min_clues)
-                solution = list(bruteforce(puzzle))[0]
+                solution = next(bruteforce(puzzle))
                 
                 np_puzzle = self._convert_sudoku_to_numpy(puzzle)
                 
@@ -74,17 +74,19 @@ class SudokuGame:
                         logging.info(f"Generated puzzle was too easy for 'hard' (Attempt {attempt+1}/{max_retries}). Retrying...")
                         continue
                     else:
-                         logging.info(f"Generated puzzle passed 'hard' difficulty check (Attempt {attempt+1}/{max_retries}).")
-                         return np_puzzle, self._convert_sudoku_to_numpy(solution)
+                        logging.info(f"Generated puzzle passed 'hard' difficulty check (Attempt {attempt+1}/{max_retries}).")
+                        return np_puzzle, self._convert_sudoku_to_numpy(solution)
                 
                 elif self.difficulty == "medium":
                     # Medium could have some mixed criteria, but for now we accept standard generation
-                     return np_puzzle, self._convert_sudoku_to_numpy(solution)
+                    return np_puzzle, self._convert_sudoku_to_numpy(solution)
 
                 else: # Easy
-                    # Easy puzzles SHOULD be solvable by basic methods (mostly)
-                    # For now, we accept sudokutools' "easy" (35 clues) as is, 
-                    # but logic can be added here if needed.
+                    # Easy puzzles SHOULD be solvable by basic methods (Naked/Hidden Singles)
+                    is_basic, _ = self._solve_basic(np_puzzle)
+                    if not is_basic:
+                        logging.info(f"Generated puzzle was too hard for 'easy' (Attempt {attempt+1}/{max_retries}). Retrying...")
+                        continue
                     return np_puzzle, self._convert_sudoku_to_numpy(solution)
             
             # If retries exhausted, return the last generated one
@@ -106,7 +108,7 @@ class SudokuGame:
         """
         # This is a simplified version of the original generate_puzzle for fallback
         board: np.ndarray = self._original_generate_solved_board()
-        squares_to_remove: int = {"easy": 43, "medium": 51, "hard": 62}.get(self.difficulty, 51)
+        squares_to_remove: int = {"easy": 43, "medium": 51, "hard": 55}.get(self.difficulty, 51)
 
         cells: List[Tuple[int, int]] = [(r, c) for r in range(self.GRID_SIZE) for c in range(self.GRID_SIZE)]
         random.shuffle(cells)

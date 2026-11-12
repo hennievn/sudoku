@@ -48,11 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let history = [];
     let historyPointer = -1;
-    const MAX_HISTORY_SIZE = 20; // As discussed, 20 steps
+    const MAX_HISTORY_SIZE = 100; // Extended in-game history size
 
     let isLoading = false; // New: Loading state
     let previousBoard = []; // New: Store previous board state for optimized rendering
     let previousPencilMarks = []; // New: Store previous pencil marks for optimized rendering
+
+    function isGameActive() {
+        return Array.isArray(board) && board.length === GRID_SIZE;
+    }
 
     // Helper to manage loading state
     function setLoading(loading) {
@@ -64,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         easyDifficultyBtn.disabled = loading;
         mediumDifficultyBtn.disabled = loading;
         hardDifficultyBtn.disabled = loading;
+        updateUndoRedoButtons();
         // Add other buttons that should be disabled during loading
         if (loading) {
             loadingIndicator.style.display = 'flex'; // Show spinner
@@ -124,40 +129,49 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBoard();
     }
 
-    // New: Check for real-time conflicts
-    function checkConflicts(row, col, num) {
+    // Check for real-time rule conflicts across the board
+    function updateConflicts() {
         conflictCells = [];
-        if (num === 0) return; // No conflict if cell is empty
+        if (!errorCheckMode || !isGameActive()) return;
 
-        // Check row
-        for (let c = 0; c < GRID_SIZE; c++) {
-            if (c !== col && board[row][c] === num) {
-                conflictCells.push([row, c]);
-            }
-        }
+        const conflictSet = new Set();
 
-        // Check column
         for (let r = 0; r < GRID_SIZE; r++) {
-            if (r !== row && board[r][col] === num) {
-                conflictCells.push([r, col]);
-            }
-        }
+            for (let c = 0; c < GRID_SIZE; c++) {
+                const num = board[r][c];
+                if (num === 0) continue;
 
-        // Check 3x3 block
-        const startRow = Math.floor(row / 3) * 3;
-        const startCol = Math.floor(col / 3) * 3;
-        for (let r = startRow; r < startRow + 3; r++) {
-            for (let c = startCol; c < startCol + 3; c++) {
-                if (r !== row && c !== col && board[r][c] === num) {
-                    conflictCells.push([r, c]);
+                // Check row
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (col !== c && board[r][col] === num) {
+                        conflictSet.add(`${r},${c}`);
+                        conflictSet.add(`${r},${col}`);
+                    }
+                }
+
+                // Check column
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (row !== r && board[row][c] === num) {
+                        conflictSet.add(`${r},${c}`);
+                        conflictSet.add(`${row},${c}`);
+                    }
+                }
+
+                // Check 3x3 block
+                const startRow = Math.floor(r / 3) * 3;
+                const startCol = Math.floor(c / 3) * 3;
+                for (let row = startRow; row < startRow + 3; row++) {
+                    for (let col = startCol; col < startCol + 3; col++) {
+                        if ((row !== r || col !== c) && board[row][col] === num) {
+                            conflictSet.add(`${r},${c}`);
+                            conflictSet.add(`${row},${col}`);
+                        }
+                    }
                 }
             }
         }
 
-        // Add the current cell if it's part of a conflict
-        if (conflictCells.length > 0) {
-            conflictCells.push([row, col]);
-        }
+        conflictCells = Array.from(conflictSet).map(coord => coord.split(',').map(Number));
     }
 
 
@@ -169,22 +183,57 @@ document.addEventListener('DOMContentLoaded', () => {
         manualRemovals = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0).map(() => new Set()));
     }
 
+    function resetHistory() {
+        history = [];
+        historyPointer = -1;
+    }
+
+    function cloneState() {
+        return {
+            board: board.map(row => [...row]),
+            pencilMarks: pencilMarks.map(row => row.map(set => new Set(set))),
+            manualRemovals: manualRemovals.map(row => row.map(set => new Set(set)))
+        };
+    }
+
+    function statesEqual(a, b) {
+        if (!a || !b) return false;
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                if (a.board[r][c] !== b.board[r][c]) return false;
+
+                const marksA = a.pencilMarks[r][c];
+                const marksB = b.pencilMarks[r][c];
+                if (marksA.size !== marksB.size) return false;
+                for (const val of marksA) {
+                    if (!marksB.has(val)) return false;
+                }
+
+                const remA = a.manualRemovals[r][c];
+                const remB = b.manualRemovals[r][c];
+                if (remA.size !== remB.size) return false;
+                for (const val of remA) {
+                    if (!remB.has(val)) return false;
+                }
+            }
+        }
+        return true;
+    }
+
     function saveState() {
+        const nextState = cloneState();
+
+        // Avoid pushing duplicate consecutive states into history
+        if (historyPointer >= 0 && statesEqual(history[historyPointer], nextState)) {
+            return;
+        }
+
         // If we are not at the end of history, truncate the future history
         if (historyPointer < history.length - 1) {
             history = history.slice(0, historyPointer + 1);
         }
 
-        // Deep copy board, pencilMarks, and manualRemovals
-        const currentBoard = board.map(row => [...row]);
-        const currentPencilMarks = pencilMarks.map(row => row.map(set => new Set(set)));
-        const currentManualRemovals = manualRemovals.map(row => row.map(set => new Set(set)));
-
-        history.push({
-            board: currentBoard,
-            pencilMarks: currentPencilMarks,
-            manualRemovals: currentManualRemovals
-        });
+        history.push(nextState);
 
         // Limit history size
         if (history.length > MAX_HISTORY_SIZE) {
@@ -235,13 +284,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openInSudokuWiki() {
+        if (!isGameActive()) return;
         const sudokuString = generateSudokuString();
         const exportUrl = `https://www.sudokuwiki.org/sudoku.htm?bd=${sudokuString}`;
         window.open(exportUrl, '_blank');
     }
 
     function drawBoard() {
-        console.time('drawBoard_total');
         const boardState = {
             selectedRow: selectedCell ? parseInt(selectedCell.dataset.row) : -1,
             selectedCol: selectedCell ? parseInt(selectedCell.dataset.col) : -1,
@@ -255,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        console.time('drawBoard_cell_loop');
         for (let r = 0; r < GRID_SIZE; r++) {
             for (let c = 0; c < GRID_SIZE; c++) {
                 let cellElement = boardElement.querySelector(`[data-row='${r}'][data-col='${c}']`);
@@ -269,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Check if content needs update
                 let contentChanged = false;
-                console.time('drawBoard_content_check');
                 if (originalVal !== 0) {
                     if (cellElement.textContent !== String(originalVal) || cellElement.classList.contains('user-entered')) {
                         cellElement.textContent = originalVal;
@@ -304,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         contentChanged = true;
                     }
                 }
-                console.timeEnd('drawBoard_content_check');
 
                 // Check if classes need update
                 let classesChanged = false;
@@ -342,24 +388,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Compare current classes with newClasses
-                console.time('drawBoard_class_check');
                 const currentClasses = new Set(cellElement.classList);
                 if (currentClasses.size !== newClasses.size || ![...currentClasses].every(cls => newClasses.has(cls))) {
                     cellElement.className = ''; // Clear all existing classes
                     newClasses.forEach(cls => cellElement.classList.add(cls));
                     classesChanged = true;
                 }
-                console.timeEnd('drawBoard_class_check');
 
                 // Update previous state for next render
                 previousBoard[r][c] = currentVal;
                 previousPencilMarks[r][c] = new Set(currentPencilMarks); // Deep copy Set
             }
         }
-        console.timeEnd('drawBoard_cell_loop');
 
         // Handle highlights based on selection
-        console.time('drawBoard_selection_highlight');
+        document.querySelectorAll('.row-label').forEach(lbl => {
+            lbl.classList.toggle('active-coord', parseInt(lbl.dataset.row) === boardState.selectedRow);
+        });
+        document.querySelectorAll('.col-label').forEach(lbl => {
+            lbl.classList.toggle('active-coord', parseInt(lbl.dataset.col) === boardState.selectedCol);
+        });
+
         if (selectedCell) {
             const num = board[boardState.selectedRow][boardState.selectedCol] || originalBoard[boardState.selectedRow][boardState.selectedCol];
             updateHighlights(num);
@@ -367,8 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // If no cell is selected, ensure no cells are highlighted
             document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlighted'));
         }
-        console.timeEnd('drawBoard_selection_highlight');
-        console.timeEnd('drawBoard_total');
     }
 
     function updateHighlights(number) {
@@ -387,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectCell(cell, r, c) {
+        if (!isGameActive()) return;
         selectedCell = cell;
         drawBoard();
     }
@@ -400,25 +448,21 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHighlights(null);
         errorCells = []; // Clear errors on new game
         conflictCells = []; // Clear conflicts on new game
-        console.time('newGame_total');
         try {
-            console.time('newGame_fetch');
             const response = await fetch(`${BASE_URL}/api/new-game?difficulty=${difficulty}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.timeEnd('newGame_fetch');
 
             board = data.board;
             originalBoard = data.original_board;
             solution = data.solution;
             initPencilMarks();
             initManualRemovals();
+            resetHistory();
 
-            console.time('newGame_drawBoard');
             drawBoard();
-            console.timeEnd('newGame_drawBoard');
 
             saveState();
             setStatusMessage('New game started.', 'info');
@@ -431,14 +475,15 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatusMessage(`Failed to start new game: ${error.message}`, 'error');
         } finally {
             setLoading(false); // Clear loading state
-            console.timeEnd('newGame_total');
         }
     }
 
     function restartGame() {
+        if (!isGameActive()) return;
         board = originalBoard.map(row => [...row]);
         initPencilMarks();
         initManualRemovals();
+        resetHistory();
         selectedCell = null;
         updateHighlights(null);
         errorCells = []; // Clear errors on restart
@@ -475,6 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function getHints() {
+        if (!isGameActive()) return;
         setLoading(true); // Set loading state
         const removalsAsArrays = manualRemovals.map(row => row.map(s => Array.from(s)));
         try {
@@ -513,7 +559,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             drawBoard();
-            saveState(); // Save state after hints are loaded
+            // Update current history frame in-place so recalculating hints does not consume undo slots
+            if (historyPointer >= 0 && history[historyPointer]) {
+                history[historyPointer] = cloneState();
+            }
             setStatusMessage('Hints loaded.', 'info');
         } catch (error) {
             console.error('Error getting hints:', error);
@@ -524,6 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkSolution() {
+        if (!isGameActive()) return;
         let isCorrect = true;
         for (let r = 0; r < GRID_SIZE; r++) {
             for (let c = 0; c < GRID_SIZE; c++) {
@@ -578,12 +628,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleCellInput(value, isBackspace = false) {
-        if (!selectedCell) return;
+        if (!selectedCell || !isGameActive()) return;
         const r = parseInt(selectedCell.dataset.row);
         const c = parseInt(selectedCell.dataset.col);
         if (originalBoard[r][c] !== 0) return;
-        errorCells = [];
-        conflictCells = []; // Clear conflicts before re-evaluating
+        errorCells = []; // Clear solution-check errors on user edit
 
         if (isBackspace) {
             board[r][c] = 0;
@@ -598,16 +647,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Check for conflicts after input
-        if (board[r][c] !== 0 && errorCheckMode) {
-            checkConflicts(r, c, board[r][c]);
-        }
-
-        if (autoUpdatePencilEntries) {
+        if (autoUpdatePencilEntries && board[r][c] !== 0) {
             updatePencilMarks(r, c, board[r][c]);
         }
 
-        checkErrors(); // Still check against solution for 'error' class
+        // Re-evaluate real-time rule conflicts if Error Check Mode is enabled
+        updateConflicts();
+
         drawBoard();
         updateHighlights(board[r][c]);
         saveState();
@@ -646,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pencilMarks = state.pencilMarks.map(row => row.map(set => new Set(set)));
         manualRemovals = state.manualRemovals.map(row => row.map(set => new Set(set)));
         errorCells = []; // Clear errors on undo/redo
-        conflictCells = []; // Clear conflicts on undo/redo
+        updateConflicts(); // Re-evaluate rule conflicts on undo/redo
         drawBoard();
     }
 
@@ -700,6 +746,35 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (e) => {
         if (isLoading) return; // Prevent input when loading
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            helpModal.style.display = 'none';
+            settingsModal.style.display = 'none';
+            solvedModal.style.display = 'none';
+            if (isGameActive()) {
+                difficultyModal.style.display = 'none';
+            }
+            return;
+        }
+
+        // Handle Ctrl/Cmd+Z and Ctrl/Cmd+Y without hijacking other browser shortcuts like Ctrl+R
+        if (e.ctrlKey || e.metaKey || e.altKey) {
+            if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+                const key = e.key.toLowerCase();
+                if (key === 'z') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        redo();
+                    } else {
+                        undo();
+                    }
+                } else if (key === 'y') {
+                    e.preventDefault();
+                    redo();
+                }
+            }
             return;
         }
 
@@ -809,6 +884,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target == solvedModal) {
             solvedModal.style.display = 'none';
         }
+        if (event.target == settingsModal) {
+            settingsModal.style.display = 'none';
+        }
+        if (event.target == difficultyModal && isGameActive()) {
+            difficultyModal.style.display = 'none';
+        }
     });
 
     newGameSolvedBtn.addEventListener('click', () => {
@@ -826,6 +907,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     errorCheckModeToggle.addEventListener('change', () => {
         errorCheckMode = errorCheckModeToggle.checked;
+        updateConflicts();
+        if (isGameActive()) {
+            drawBoard();
+        }
     });
 
     autoUpdatePencilToggle.addEventListener('change', () => {
